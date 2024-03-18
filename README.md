@@ -8,11 +8,14 @@ Matlab and Python implementations from
 
 Content:
   * MATLAB/
-    * ALGS/
-    * AUXILIARY/
-    * EXAMPLES/
+    * DATA/
+    * EXPERIMENTS/
     * EXTERNAL/
-  * PYTHON/  
+    * LIBS/
+    * SOLVER/
+  * PYTHON/
+    * data/
+    * solver/ 
 
 Notes: The Matlab codes use external functions from `[1]` for tensor computations.
 The Python code uses `[2]` for interfaces to neural networks.
@@ -20,7 +23,7 @@ The Python code uses `[2]` for interfaces to neural networks.
 ## Example(s)
 
 ### Matlab
-You can run a relatively small Matlab example from within MATLAB/EXAMPLES/
+You can run a relatively small Matlab example from within MATLAB/
 
 ```
 >> example_1
@@ -66,35 +69,95 @@ k    	 nf      	 fk         	 ||gk||         	 step        	 iexit
 30 	 77 	 1.13207e-10      	 2.02066e-05       	 1.882e-03     	 1 
 ```
 
-A larger example is given by ``>> example_2``
+A larger experiment is given in MATLAB/EXPERIMENTS/ML_REGRESSION/ ``>> mnist_train``
+
+```
+>> mnist_train
+
+#########################################################
+#
+# MNIST Dataset for digit classification 
+# 
+# N    = 60000 	 (data size) 
+# nx   = 784 	 (img pixels) 
+# Btch = 256 	 (batch size) 
+# d    = 7840 	 (num. vars) 
+#
+# Alg  = compact 	 (algorithm) 
+# 
+#########################################################
+Epoch   	 Iter    	 Loss    	 Accr    	 norm(w) 	 norm(g) 
+1       	 235     	 0.418   	 0.904   	  7.3   	  0.488   	 
+2       	 470     	 0.377   	 0.912   	  8.7   	  0.432   	 
+3       	 705     	 0.357   	 0.914   	  9.61   	  0.411   	 
+4       	 940     	 0.343   	 0.915   	  10.3   	  0.399   	 
+5       	 1175     	 0.334   	 0.917   	  10.9   	  0.389   	 
+6       	 1410     	 0.327   	 0.917   	  11.5   	  0.382   	 
+7       	 1645     	 0.32   	 0.917   	  11.9   	  0.377   	 
+8       	 1880     	 0.315   	 0.919   	  12.3   	  0.373   	 
+9       	 2115     	 0.31   	 0.919   	  12.7   	  0.368   	 
+10       	 2350     	 0.306   	 0.919   	  13.1   	  0.364   	 
+11       	 2585     	 0.302   	 0.92   	  13.4   	  0.36   	 
+12       	 2820     	 0.297   	 0.92   	  13.8   	  0.355   	 
+13       	 3055     	 0.294   	 0.921   	  14.1   	  0.351   	 
+14       	 3290     	 0.29   	 0.921   	  14.4   	  0.347   	 
+15       	 3525     	 0.286   	 0.921   	  14.7   	  0.344   	 
+16       	 3760     	 0.283   	 0.921   	  15   	  0.341   	 
+17       	 3995     	 0.279   	 0.921   	  15.2   	  0.338   	 
+18       	 4230     	 0.276   	 0.921   	  15.5   	  0.335   	 
+19       	 4465     	 0.273   	 0.921   	  15.7   	  0.332   	 
+20       	 4700     	 0.27   	 0.921   	  16   	  0.33  
+```
+
+In general, you can run the Matlab experiments from within MATLAB/EXPERIMENTS/ 
 
 ### Python
-Likewise, in the Julia REPL, navigate to the JULIA/EXAMPLES folder. 
-Run the following from within the folder (tested with Julia 1.6.5):
+Likewise, in Python you can run the compact solver (tested with Python 3.11.8)
+
+Note: In order to run the method for a Fashion MNIST classification,
+both `PyTorch` and its library `torchvision` have to be installed.
+(For managing the packages one can use Anaconda or related package managers)
+
+From within the PYTHON folder
 
 ```
-julia> include("../AUXILIARY/setup.jl"); # setup the dependencies
-
+ python3 fashionMnistCOMP.py 
 ```
 
-Run examples equivalent to MATLAB:
+yields the output
 
 ```
-julia> include("example_1.jl");
+Epoch 1
+-------------------------------
+loss: 2.303020  [   64/60000]
+loss: 0.712614  [ 6464/60000]
+loss: 0.475621  [12864/60000]
+loss: 0.649297  [19264/60000]
+loss: 0.521813  [25664/60000]
+loss: 0.452051  [32064/60000]
+loss: 0.434324  [38464/60000]
+loss: 0.551466  [44864/60000]
+loss: 0.585781  [51264/60000]
+loss: 0.669467  [57664/60000]
+Test Error: 
+ Accuracy: 82.8%, Avg loss: 0.464052 
 
------------ COMP Algorithm ----------- 
-
-Problem Size
-Tests:                 20
-Samples:               64
-Input Expct. Positive: 2 
-
-OUTPUTS:################
-Time (search):         5.6223e-5
-Positive items:        2
-########################
-Identified Indices:    [2, 13]
-
+Epoch 2
+-------------------------------
+loss: 0.359722  [   64/60000]
+loss: 0.387545  [ 6464/60000]
+loss: 0.299054  [12864/60000]
+loss: 0.395482  [19264/60000]
+loss: 0.369756  [25664/60000]
+loss: 0.435838  [32064/60000]
+loss: 0.333493  [38464/60000]
+loss: 0.477194  [44864/60000]
+loss: 0.474102  [51264/60000]
+loss: 0.578183  [57664/60000]
+Test Error: 
+ Accuracy: 85.0%, Avg loss: 0.413415
+....
+....
 ```
 
 ## Cite
