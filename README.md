@@ -8,11 +8,14 @@ Matlab and Python implementations from
 
 Content:
   * MATLAB/
-    * ALGS/
-    * AUXILIARY/
-    * EXAMPLES/
+    * DATA/
+    * EXPERIMENTS/
     * EXTERNAL/
-  * PYTHON/  
+    * LIBS/
+    * SOLVER/
+  * PYTHON/
+    * data/
+    * solver/ 
 
 Notes: The Matlab codes use external functions from `[1]` for tensor computations.
 The Python code uses `[2]` for interfaces to neural networks.
