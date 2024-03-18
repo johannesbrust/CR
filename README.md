@@ -4,7 +4,7 @@
 Matlab and Python implementations from
 
 "Useful Compact Representations for Data Fitting", J. Brust (2024),
-[[Article](https://www.medrxiv.org/content/10.1101/2022.08.23.22279137v1 "Technical Report")]
+
 
 Content:
   * MATLAB/
