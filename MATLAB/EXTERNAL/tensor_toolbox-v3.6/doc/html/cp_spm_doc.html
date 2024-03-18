@@ -1,0 +1,235 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Subspace Power Method for CP Decomposition of Symmetric Tensors</title><meta name="generator" content="MATLAB 9.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-08-16"><meta name="DC.source" content="cp_spm_doc.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:90%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:12px; color:#000; line-height:140%; background:#fff none; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:2.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+.banner{ background-color:#15243c; text-align:center;}
+.navigate {font-size:0.8em; padding:0px; line-height:100%; }
+
+pre, code { font-size:14px; }
+tt { font-size: 1.0em; font-weight:bold; background:#f7f7f7; padding-right:5px; padding-left:5px }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:20px 0px 0px; border-top:1px dotted #878787; font-size:0.9em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; padding:0px 20px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="banner"><a href="index.html"><img src="Tensor-Toolbox-for-MATLAB-Banner.png"></a></div><div class="content"><h1>Subspace Power Method for CP Decomposition of Symmetric Tensors</h1><!--introduction--><p>
+<p class="navigate">
+&#62;&#62; <a href="index.html">Tensor Toolbox</a>
+&#62;&#62; <a href="cp.html">CP Decompositions</a>
+&#62;&#62; <a href="cp_spm_doc.html">CP-SPM</a>
+</p>
+</p><p>The function <tt>cp_spm</tt> computes the symmetric CP decomposition of a symmetric tensor using the Subspace Power Method (SPM). The symmetric CP decomposition is described in <a href="cp_sym_doc.html">Symmetric CP Decomposition</a>, while SPM is described in the following reference:</p><div><ul><li>J. Kileel, J. M. Pereira, Subspace power method for symmetric tensor   decomposition and generalized PCA,   <a href="https://arxiv.org/abs/1912.04007">arXiv:1912.04007</a>, 2020</li></ul></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create a sample problem</a></li><li><a href="#3">Run CP-SPM</a></li><li><a href="#5">Compare with CP-SYM using L-BFGS from Poblano Toolbox</a></li></ul></div><h2 id="1">Create a sample problem</h2><p>For consistency, we use the same example as in <a href="cp_sym_doc.html">Symmetric CP Decomposition</a></p><pre class="codeinput">d = 3; <span class="comment">% order</span>
+n = 10; <span class="comment">% size</span>
+r = 2; <span class="comment">% true rank</span>
+
+rng(5); <span class="comment">% Set random number generator state for consistent results</span>
+
+info = create_problem(<span class="string">'Size'</span>, n*ones(d,1), <span class="string">'Num_Factors'</span>, r, <span class="keyword">...</span>
+    <span class="string">'Symmetric'</span>, 1:d, <span class="string">'Factor_Generator'</span>, @rand, <span class="string">'Lambda_Generator'</span>, @rand, <span class="string">'Noise'</span>, 0.1);
+
+X = info.Data;
+M_true = info.Soln;
+S_true = symktensor(M_true); <span class="comment">% Convert from ktensor to symktensor</span>
+</pre><p>Check that the tensor is symmetric</p><pre class="codeinput">issymmetric(X)
+</pre><pre class="codeoutput">
+ans =
+
+  logical
+
+   1
+
+</pre><h2 id="3">Run CP-SPM</h2><p>SPM estimates the rank by picking a cut-off of the eigenvalues of the tensor flattening. We plot these eigenvalues as follows:</p><pre class="codeinput">cp_spm(X, <span class="string">'rank_sel'</span>, <span class="string">'plot_only'</span>);
+</pre><img vspace="5" hspace="5" src="cp_spm_doc_01.png" alt=""> <p>We observe the first two eigenvalues contain most of the energy, and conclude the tensor is approximately rank 2</p><pre class="codeinput">rng(5); <span class="comment">% Set random number generator state for consistent results</span>
+
+tic
+[S, info] = cp_spm(X, 2);
+toc
+
+fprintf(<span class="string">'\n'</span>);
+fprintf(<span class="string">'Final function value: %.2g\n'</span>, fg_explicit(S, X, norm(X)^2));
+fprintf(<span class="string">'Check similarity score (1=perfect): %.2f\n'</span>, score(S, S_true));
+fprintf(<span class="string">'\n'</span>);
+</pre><pre class="codeoutput">Elapsed time is 0.022587 seconds.
+
+Final function value: 0.39
+Check similarity score (1=perfect): 0.93
+
+</pre><h2 id="5">Compare with CP-SYM using L-BFGS from Poblano Toolbox</h2><p>We compare SPM with <tt>cp_sym</tt>. Its options are explained in <a href="cp_sym_doc.html">Symmetric CP Decomposition</a>; This is the recommended way to run the method:</p><pre class="codeinput">optparams = lbfgs(<span class="string">'defaults'</span>); <span class="comment">% Get the optimization parameters</span>
+optparams.RelFuncTol = 1e-10; <span class="comment">% Tighten the stopping tolerance</span>
+optparams.StopTol = 1e-6; <span class="comment">% Tighten the stopping tolerance</span>
+rng(5); <span class="comment">% Set random number generator state for consistent results</span>
+
+tic
+[S,info] = cp_sym(X, 2,<span class="string">'unique'</span>,false,<span class="string">'l1param'</span>,0,<span class="string">'alg_options'</span>,optparams);
+toc
+
+fprintf(<span class="string">'\n'</span>);
+fprintf(<span class="string">'Final function value: %.2g\n'</span>, fg_explicit(S, X, norm(X)^2));
+fprintf(<span class="string">'Stopping condition: %s\n'</span>, info.optout.ExitDescription);
+fprintf(<span class="string">'Check similarity score (1=perfect): %.2f\n'</span>, score(S, S_true));
+fprintf(<span class="string">'\n'</span>);
+</pre><pre class="codeoutput"> Iter  FuncEvals       F(X)          ||G(X)||/N        
+------ --------- ---------------- ----------------
+     0         1       7.34429496       3.10499258
+     1         8       0.40258352       0.08233575
+     2        10       0.37608104       0.04310174
+     3        12       0.36658247       0.01555076
+     4        14       0.36528638       0.00530333
+     5        16       0.36488180       0.00311884
+     6        18       0.36484022       0.00174885
+     7        21       0.36477178       0.00360656
+     8        23       0.36472681       0.00208400
+     9        26       0.36467068       0.00313366
+    10        28       0.36461167       0.00116220
+    11        30       0.36460241       0.00025735
+    12        32       0.36460199       0.00012652
+    13        34       0.36460188       0.00014958
+    14        36       0.36460181       0.00004645
+    15        38       0.36460180       0.00000968
+    16        40       0.36460180       0.00000896
+    17        42       0.36460180       0.00000387
+    18        44       0.36460180       0.00000212
+    19        46       0.36460180       0.00000117
+Elapsed time is 0.142301 seconds.
+
+Final function value: 0.36
+Stopping condition: Relative change in F &lt; RelFuncTol
+Check similarity score (1=perfect): 0.99
+
+</pre><p class="footer">Tensor Toolbox for MATLAB: <a href="index.html">www.tensortoolbox.org</a>.</p></div><!--
+##### SOURCE BEGIN #####
+%% Subspace Power Method for CP Decomposition of Symmetric Tensors
+%
+% <html>
+% <p class="navigate">
+% &#62;&#62; <a href="index.html">Tensor Toolbox</a> 
+% &#62;&#62; <a href="cp.html">CP Decompositions</a> 
+% &#62;&#62; <a href="cp_spm_doc.html">CP-SPM</a>
+% </p>
+% </html>
+%
+% The function |cp_spm| computes the symmetric CP decomposition of a 
+% symmetric tensor using the Subspace Power Method (SPM). The symmetric CP
+% decomposition is described in <cp_sym_doc.html Symmetric CP Decomposition>,
+% while SPM is described in the following reference:
+%
+% * J. Kileel, J. M. Pereira, Subspace power method for symmetric tensor
+%   decomposition and generalized PCA, 
+%   <https://arxiv.org/abs/1912.04007 arXiv:1912.04007>, 2020
+
+%% Create a sample problem 
+% For consistency, we use the same example as in <cp_sym_doc.html Symmetric CP 
+% Decomposition>
+d = 3; % order
+n = 10; % size
+r = 2; % true rank
+
+rng(5); % Set random number generator state for consistent results
+
+info = create_problem('Size', n*ones(d,1), 'Num_Factors', r, ...
+    'Symmetric', 1:d, 'Factor_Generator', @rand, 'Lambda_Generator', @rand, 'Noise', 0.1);
+
+X = info.Data;
+M_true = info.Soln; 
+S_true = symktensor(M_true); % Convert from ktensor to symktensor
+
+%%
+% Check that the tensor is symmetric
+issymmetric(X)
+
+%% Run CP-SPM 
+% SPM estimates the rank by picking a cut-off of the eigenvalues of the 
+% tensor flattening. We plot these eigenvalues as follows:
+cp_spm(X, 'rank_sel', 'plot_only');
+
+%%
+% We observe the first two eigenvalues contain most of the energy, and 
+% conclude the tensor is approximately rank 2
+
+rng(5); % Set random number generator state for consistent results
+
+tic
+[S, info] = cp_spm(X, 2);
+toc
+
+fprintf('\n');
+fprintf('Final function value: %.2g\n', fg_explicit(S, X, norm(X)^2));
+fprintf('Check similarity score (1=perfect): %.2f\n', score(S, S_true));
+fprintf('\n');
+
+%% Compare with CP-SYM using L-BFGS from Poblano Toolbox
+% We compare SPM with |cp_sym|. Its options are explained in <cp_sym_doc.html 
+% Symmetric CP Decomposition>; This is the recommended way to run the 
+% method:
+optparams = lbfgs('defaults'); % Get the optimization parameters
+optparams.RelFuncTol = 1e-10; % Tighten the stopping tolerance
+optparams.StopTol = 1e-6; % Tighten the stopping tolerance
+rng(5); % Set random number generator state for consistent results
+
+tic
+[S,info] = cp_sym(X, 2,'unique',false,'l1param',0,'alg_options',optparams);
+toc
+
+fprintf('\n');
+fprintf('Final function value: %.2g\n', fg_explicit(S, X, norm(X)^2));
+fprintf('Stopping condition: %s\n', info.optout.ExitDescription);
+fprintf('Check similarity score (1=perfect): %.2f\n', score(S, S_true));
+fprintf('\n');
+##### SOURCE END #####
+--></body></html>

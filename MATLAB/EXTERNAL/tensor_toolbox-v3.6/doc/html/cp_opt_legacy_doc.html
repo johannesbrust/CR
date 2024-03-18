@@ -1,0 +1,509 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>All-at-once optimization for CP tensor decomposition</title><meta name="generator" content="MATLAB 9.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-08-16"><meta name="DC.source" content="cp_opt_legacy_doc.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:90%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:12px; color:#000; line-height:140%; background:#fff none; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:2.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+.banner{ background-color:#15243c; text-align:center;}
+.navigate {font-size:0.8em; padding:0px; line-height:100%; }
+
+pre, code { font-size:14px; }
+tt { font-size: 1.0em; font-weight:bold; background:#f7f7f7; padding-right:5px; padding-left:5px }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:20px 0px 0px; border-top:1px dotted #878787; font-size:0.9em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; padding:0px 20px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="banner"><a href="index.html"><img src="Tensor-Toolbox-for-MATLAB-Banner.png"></a></div><div class="content"><h1>All-at-once optimization for CP tensor decomposition</h1><!--introduction--><p>
+<p class="navigate">
+&#62;&#62; <a href="index.html">Tensor Toolbox</a>
+&#62;&#62; <a href="cp.html">CP Decompositions</a>
+&#62;&#62; <a href="cp_opt_doc.html">CP-OPT</a>
+&#62;&#62; <a href="cp_opt_legacy_doc.html">CP-OPT (legacy)</a>
+</p>
+</p><p>We explain how to use <tt>cp_opt_legacy</tt> function which implements the <b>CP-OPT</b> method that fits the CP model using <i>direct</i> or <i>all-at-once</i> optimization. This is in contrast to the <tt>cp_als</tt> function which implements the <b>CP-ALS</b> that fits the CP model using <i>alternating</i> optimization. The CP-OPT method is described in the following reference:</p><div><ul><li>E. Acar, D. M. Dunlavy and T. G. Kolda, A Scalable Optimization Approach for Fitting Canonical Tensor Decompositions, J. Chemometrics, 25(2):67-86, 2011, <a href="http://doi.org/10.1002/cem.1335">http://doi.org/10.1002/cem.1335</a></li></ul></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Newer version available</a></li><li><a href="#2">Third-party optimization software</a></li><li><a href="#3">Check that the software is installed.</a></li><li><a href="#4">Create an example problem.</a></li><li><a href="#5">Create initial guess using 'nvecs'</a></li><li><a href="#6">Call the <tt>cp_opt_legacy</tt> method</a></li><li><a href="#7">Check the output</a></li><li><a href="#9">Evaluate the output</a></li><li><a href="#10">Overfitting example</a></li><li><a href="#13">Nonnegative factorization</a></li><li><a href="#14">Create an example problem.</a></li><li><a href="#15">Generate initial guess of the corret size</a></li><li><a href="#16">Call the <tt>cp_opt_legacy</tt> method</a></li><li><a href="#17">Check the output</a></li><li><a href="#19">Evaluate the output</a></li></ul></div><h2 id="1">Newer version available</h2><p>This documentation is for the legacy implementation of CP-OPT. We recommend using the newer version, described <a href="cp_opt_doc.html">here</a>.</p><h2 id="2">Third-party optimization software</h2><p>The <tt>cp_opt_legacy</tt> method uses third-party optimization software to do the optimization. You can use either</p><div><ul><li><a href="https://github.com/stephenbeckr/L-BFGS-B-C"><b>L-BFGS-B</b> by Stephen Becker</a> (preferred), or</li><li><a href="https://software.sandia.gov/trac/poblano"><b>POBLANO</b> Version 1.1 by Evrim Acar, Daniel Dunlavy, and Tamara Kolda</a>.</li></ul></div><p>The remainder of these instructions assume L-BFGS-B is being used. See <a href="cp_opt_legacy_poblano_doc.html">here</a> for instructions on using <tt>cp_opt_legacy</tt> with Poblano.</p><h2 id="3">Check that the software is installed.</h2><p>Be sure that lbfgsb is in your path.</p><pre class="codeinput">help <span class="string">lbfgsb</span>
+</pre><pre class="codeoutput">  x = lbfgsb( fcn, l, u )
+    uses the lbfgsb v.3.0 library (fortran files must be installed;
+        see compile_mex.m ) which is the L-BFGS-B algorithm.
+    The algorithm is similar to the L-BFGS quasi-Newton algorithm,
+    but also handles bound constraints via an active-set type iteration.
+    This version is based on the modified C code L-BFGS-B-C, and so has 
+    a slightly different calling syntax than previous versions.
+ 
+   The minimization problem that it solves is:
+        min_x  f(x)     subject to   l &lt;= x &lt;= u
+ 
+  'fcn' is a function handle that accepts an input, 'x',
+    and returns two outputs, 'f' (function value), and 'g' (function gradient).
+ 
+  'l' and 'u' are column-vectors of constraints. Set their values to Inf
+    if you want to ignore them. (You can set some values to Inf, but keep
+    others enforced).
+ 
+  The full format of the function is:
+  [x,f,info] = lbfgsb( fcn, l, u, opts )
+    where the output 'f' has the value of the function f at the final iterate
+    and 'info' is a structure with useful information
+        (self-explanatory, except for info.err. The first column of info.err
+         is the history of the function values f, and the second column
+         is the history of norm( gradient, Inf ).  )
+ 
+    The 'opts' structure allows you to pass further options.
+    Possible field name values:
+ 
+        opts.x0     The starting value (default: all zeros)
+        opts.m      Number of limited-memory vectors to use in the algorithm
+                        Try 3 &lt;= m &lt;= 20. (default: 5 )
+        opts.factr  Tolerance setting (see this source code for more info)
+                        (default: 1e7 ). This is later multiplied by machine epsilon
+        opts.pgtol  Another tolerance setting, relating to norm(gradient,Inf)
+                        (default: 1e-5)
+        opts.maxIts         How many iterations to allow (default: 100)
+        opts.maxTotalIts    How many iterations to allow, including linesearch iterations
+                        (default: 5000)
+        opts.printEvery     How often to display information (default: 1)
+        opts.errFcn         A function handle (or cell array of several function handles)
+                        that computes whatever you want. The output will be printed
+                        to the screen every 'printEvery' iterations. (default: [] )
+                        Results saved in columns 3 and higher of info.err variable
+ 
+  Stephen Becker, srbecker@alumni.caltech.edu
+  Feb 14, 2012
+  Updated Feb 21 2015, Stephen Becker, stephen.becker@colorado.edu
+
+</pre><h2 id="4">Create an example problem.</h2><p>Create an example 50 x 40 x 30 tensor with rank 5 and add 10% noise.</p><pre class="codeinput">rng(<span class="string">'default'</span>); <span class="comment">%&lt;- Setting random seed for reproducibility of this script</span>
+R = 5;
+info = create_problem(<span class="string">'Size'</span>, [50 40 30], <span class="string">'Num_Factors'</span>, R, <span class="string">'Noise'</span>, 0.10);
+X = info.Data;
+M_true = info.Soln;
+</pre><h2 id="5">Create initial guess using 'nvecs'</h2><pre class="codeinput">M_init = create_guess(<span class="string">'Data'</span>, X, <span class="string">'Num_Factors'</span>, R, <span class="string">'Factor_Generator'</span>, <span class="string">'nvecs'</span>);
+</pre><h2 id="6">Call the <tt>cp_opt_legacy</tt> method</h2><p>Here is an example call to the <tt>cp_opt_legacy</tt> method. By default, each iteration prints the least squares fit function value (being minimized) and the norm of the gradient.</p><pre class="codeinput">[M,M0,output] = cp_opt_legacy(X, R, <span class="string">'init'</span>, M_init);
+</pre><pre class="codeoutput">Iter    10, f(x) = 2.127981e+03, ||grad||_infty = 5.04e+02
+Iter    20, f(x) = 5.558298e+02, ||grad||_infty = 6.07e-01
+Iter    30, f(x) = 5.551920e+02, ||grad||_infty = 2.89e+00
+Iter    40, f(x) = 5.549826e+02, ||grad||_infty = 2.52e+00
+Iter    50, f(x) = 5.544325e+02, ||grad||_infty = 5.78e-01
+Iter    60, f(x) = 5.542962e+02, ||grad||_infty = 1.06e+00
+Iter    70, f(x) = 5.540865e+02, ||grad||_infty = 9.96e-01
+Iter    80, f(x) = 5.538628e+02, ||grad||_infty = 4.11e-01
+Iter    90, f(x) = 5.537953e+02, ||grad||_infty = 2.73e-01
+Iter   100, f(x) = 5.537615e+02, ||grad||_infty = 1.10e+00
+Iter   110, f(x) = 5.537386e+02, ||grad||_infty = 3.27e-01
+Iter   120, f(x) = 5.537120e+02, ||grad||_infty = 1.91e+00
+Iter   130, f(x) = 5.536752e+02, ||grad||_infty = 7.03e-01
+Iter   140, f(x) = 5.536120e+02, ||grad||_infty = 2.03e+00
+Iter   150, f(x) = 5.535694e+02, ||grad||_infty = 4.18e-01
+Iter   160, f(x) = 5.535360e+02, ||grad||_infty = 2.62e-01
+Iter   170, f(x) = 5.535234e+02, ||grad||_infty = 4.82e-01
+Iter   180, f(x) = 5.535053e+02, ||grad||_infty = 4.26e-01
+Iter   190, f(x) = 5.534586e+02, ||grad||_infty = 5.68e-01
+Iter   200, f(x) = 5.534267e+02, ||grad||_infty = 1.16e-01
+Iter   210, f(x) = 5.534137e+02, ||grad||_infty = 1.39e-01
+Iter   220, f(x) = 5.534067e+02, ||grad||_infty = 1.91e-01
+Iter   230, f(x) = 5.533932e+02, ||grad||_infty = 4.43e-01
+Iter   240, f(x) = 5.533720e+02, ||grad||_infty = 3.60e-01
+Iter   250, f(x) = 5.533548e+02, ||grad||_infty = 1.90e-01
+Iter   260, f(x) = 5.533373e+02, ||grad||_infty = 2.83e-01
+Iter   270, f(x) = 5.533247e+02, ||grad||_infty = 1.36e-01
+Iter   280, f(x) = 5.533052e+02, ||grad||_infty = 3.17e-01
+Iter   290, f(x) = 5.532915e+02, ||grad||_infty = 4.59e-01
+Iter   300, f(x) = 5.532845e+02, ||grad||_infty = 7.43e-02
+Iter   310, f(x) = 5.532803e+02, ||grad||_infty = 1.29e-01
+Iter   320, f(x) = 5.532758e+02, ||grad||_infty = 6.66e-01
+Iter   330, f(x) = 5.532708e+02, ||grad||_infty = 2.85e-01
+Iter   340, f(x) = 5.532651e+02, ||grad||_infty = 1.63e-01
+Iter   350, f(x) = 5.532621e+02, ||grad||_infty = 7.22e-02
+Iter   360, f(x) = 5.532617e+02, ||grad||_infty = 5.31e-02
+Iter   370, f(x) = 5.532610e+02, ||grad||_infty = 1.71e-02
+Iter   380, f(x) = 5.532605e+02, ||grad||_infty = 6.43e-02
+Iter   390, f(x) = 5.532604e+02, ||grad||_infty = 2.71e-02
+Iter   400, f(x) = 5.532602e+02, ||grad||_infty = 2.94e-02
+Iter   410, f(x) = 5.532601e+02, ||grad||_infty = 2.49e-02
+Iter   420, f(x) = 5.532598e+02, ||grad||_infty = 2.22e-02
+Iter   430, f(x) = 5.532597e+02, ||grad||_infty = 3.14e-02
+Iter   433, f(x) = 5.532597e+02, ||grad||_infty = 1.11e-02
+</pre><h2 id="7">Check the output</h2><p>It's important to check the output of the optimization method. In particular, it's worthwhile to check the exit message. The message <tt>CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH</tt> means that it has converged because the function value stopped improving.</p><pre class="codeinput">exitmsg = output.ExitMsg
+</pre><pre class="codeoutput">
+exitmsg =
+
+    'CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH.'
+
+</pre><p>The fit is the percentage of the data that is explained by the model. Because we have noise, we do not expect the fit to be perfect.</p><pre class="codeinput">fit = output.Fit
+</pre><pre class="codeoutput">
+fit =
+
+   99.0220
+
+</pre><h2 id="9">Evaluate the output</h2><p>We can "score" the similarity of the model computed by CP and compare that with the truth. The <tt>score</tt> function on ktensor's gives a score in [0,1]  with 1 indicating a perfect match. Because we have noise, we do not expect the fit to be perfect. See <a href="matlab:doc('ktensor/score')">doc score</a> for more details.</p><pre class="codeinput">scr = score(M,M_true)
+</pre><pre class="codeoutput">
+scr =
+
+    0.7998
+
+</pre><h2 id="10">Overfitting example</h2><p>Re-using the same example as before, consider the case where we don't know R in advance. We might guess too high. Here we show a case where we guess R+1 factors rather than R.</p><pre class="codeinput"><span class="comment">% Generate initial guess of the corret size</span>
+M_plus_init = create_guess(<span class="string">'Data'</span>, X, <span class="string">'Num_Factors'</span>, R+1, <span class="keyword">...</span>
+    <span class="string">'Factor_Generator'</span>, <span class="string">'nvecs'</span>);
+</pre><pre class="codeinput"><span class="comment">% Run the algorithm</span>
+[M_plus,~,output] = cp_opt_legacy(X, R+1, <span class="string">'init'</span>, M_plus_init);
+exitmsg = output.ExitMsg
+fit = output.Fit
+</pre><pre class="codeoutput">Iter    10, f(x) = 2.126594e+03, ||grad||_infty = 5.05e+02
+Iter    20, f(x) = 5.560240e+02, ||grad||_infty = 6.22e-01
+Iter    30, f(x) = 5.546591e+02, ||grad||_infty = 3.27e+00
+Iter    40, f(x) = 5.540186e+02, ||grad||_infty = 4.62e+00
+Iter    50, f(x) = 5.529459e+02, ||grad||_infty = 1.28e+00
+Iter    60, f(x) = 5.528452e+02, ||grad||_infty = 7.27e-01
+Iter    70, f(x) = 5.521932e+02, ||grad||_infty = 6.45e-01
+Iter    80, f(x) = 5.520235e+02, ||grad||_infty = 1.20e+00
+Iter    90, f(x) = 5.519666e+02, ||grad||_infty = 2.69e-01
+Iter   100, f(x) = 5.517083e+02, ||grad||_infty = 4.69e-01
+Iter   110, f(x) = 5.516412e+02, ||grad||_infty = 4.07e-01
+Iter   120, f(x) = 5.515534e+02, ||grad||_infty = 5.94e-01
+Iter   130, f(x) = 5.514324e+02, ||grad||_infty = 8.34e-01
+Iter   140, f(x) = 5.513545e+02, ||grad||_infty = 9.00e-01
+Iter   150, f(x) = 5.513256e+02, ||grad||_infty = 7.89e-01
+Iter   160, f(x) = 5.512999e+02, ||grad||_infty = 4.67e-01
+Iter   170, f(x) = 5.512438e+02, ||grad||_infty = 6.21e-01
+Iter   180, f(x) = 5.512105e+02, ||grad||_infty = 1.65e-01
+Iter   190, f(x) = 5.511846e+02, ||grad||_infty = 3.21e-01
+Iter   200, f(x) = 5.511424e+02, ||grad||_infty = 2.31e-01
+Iter   210, f(x) = 5.511226e+02, ||grad||_infty = 3.45e-01
+Iter   220, f(x) = 5.510866e+02, ||grad||_infty = 2.70e-01
+Iter   230, f(x) = 5.510718e+02, ||grad||_infty = 2.43e-01
+Iter   240, f(x) = 5.510516e+02, ||grad||_infty = 1.42e-01
+Iter   250, f(x) = 5.510357e+02, ||grad||_infty = 3.43e-01
+Iter   260, f(x) = 5.510208e+02, ||grad||_infty = 3.08e-01
+Iter   270, f(x) = 5.509572e+02, ||grad||_infty = 3.87e-01
+Iter   280, f(x) = 5.509329e+02, ||grad||_infty = 4.97e-01
+Iter   290, f(x) = 5.509159e+02, ||grad||_infty = 2.11e-01
+Iter   300, f(x) = 5.509049e+02, ||grad||_infty = 3.04e-01
+Iter   310, f(x) = 5.508860e+02, ||grad||_infty = 1.57e-01
+Iter   320, f(x) = 5.508805e+02, ||grad||_infty = 2.29e-01
+Iter   330, f(x) = 5.508741e+02, ||grad||_infty = 3.44e-01
+Iter   340, f(x) = 5.508599e+02, ||grad||_infty = 2.41e-01
+Iter   350, f(x) = 5.508430e+02, ||grad||_infty = 2.11e-01
+Iter   360, f(x) = 5.508228e+02, ||grad||_infty = 8.22e-01
+Iter   370, f(x) = 5.508002e+02, ||grad||_infty = 8.91e-01
+Iter   380, f(x) = 5.507405e+02, ||grad||_infty = 3.57e-01
+Iter   390, f(x) = 5.507079e+02, ||grad||_infty = 2.94e-01
+Iter   400, f(x) = 5.506815e+02, ||grad||_infty = 6.07e-01
+Iter   410, f(x) = 5.506510e+02, ||grad||_infty = 2.21e-01
+Iter   420, f(x) = 5.506304e+02, ||grad||_infty = 7.05e-01
+Iter   430, f(x) = 5.506208e+02, ||grad||_infty = 2.88e-01
+Iter   440, f(x) = 5.506106e+02, ||grad||_infty = 2.40e-01
+Iter   450, f(x) = 5.506046e+02, ||grad||_infty = 1.84e-01
+Iter   460, f(x) = 5.505972e+02, ||grad||_infty = 2.19e-01
+Iter   470, f(x) = 5.505936e+02, ||grad||_infty = 2.57e-01
+Iter   480, f(x) = 5.505779e+02, ||grad||_infty = 4.13e-01
+Iter   490, f(x) = 5.505685e+02, ||grad||_infty = 2.86e-01
+Iter   500, f(x) = 5.505542e+02, ||grad||_infty = 1.57e-01
+Iter   510, f(x) = 5.505468e+02, ||grad||_infty = 2.88e-01
+Iter   520, f(x) = 5.505433e+02, ||grad||_infty = 4.07e-02
+Iter   530, f(x) = 5.505419e+02, ||grad||_infty = 1.50e-01
+Iter   540, f(x) = 5.505398e+02, ||grad||_infty = 1.05e-01
+Iter   550, f(x) = 5.505385e+02, ||grad||_infty = 6.65e-02
+Iter   560, f(x) = 5.505370e+02, ||grad||_infty = 1.03e-01
+Iter   570, f(x) = 5.505354e+02, ||grad||_infty = 4.84e-01
+Iter   580, f(x) = 5.505325e+02, ||grad||_infty = 2.54e-01
+Iter   590, f(x) = 5.505280e+02, ||grad||_infty = 8.43e-02
+Iter   600, f(x) = 5.505260e+02, ||grad||_infty = 2.18e-01
+Iter   610, f(x) = 5.505247e+02, ||grad||_infty = 2.90e-01
+Iter   620, f(x) = 5.505232e+02, ||grad||_infty = 4.18e-02
+Iter   630, f(x) = 5.505220e+02, ||grad||_infty = 1.61e-01
+Iter   640, f(x) = 5.505188e+02, ||grad||_infty = 2.31e-01
+Iter   650, f(x) = 5.505171e+02, ||grad||_infty = 1.25e-01
+Iter   660, f(x) = 5.505131e+02, ||grad||_infty = 1.27e-01
+Iter   670, f(x) = 5.505088e+02, ||grad||_infty = 3.52e-02
+Iter   680, f(x) = 5.505053e+02, ||grad||_infty = 1.21e-01
+Iter   690, f(x) = 5.505033e+02, ||grad||_infty = 1.42e-01
+Iter   700, f(x) = 5.505020e+02, ||grad||_infty = 7.37e-02
+Iter   710, f(x) = 5.505013e+02, ||grad||_infty = 1.10e-01
+Iter   720, f(x) = 5.505007e+02, ||grad||_infty = 9.15e-02
+Iter   730, f(x) = 5.505001e+02, ||grad||_infty = 6.26e-02
+Iter   740, f(x) = 5.504991e+02, ||grad||_infty = 6.09e-02
+Iter   750, f(x) = 5.504979e+02, ||grad||_infty = 9.48e-02
+Iter   760, f(x) = 5.504951e+02, ||grad||_infty = 3.52e-02
+Iter   770, f(x) = 5.504935e+02, ||grad||_infty = 2.88e-02
+Iter   780, f(x) = 5.504921e+02, ||grad||_infty = 1.49e-02
+Iter   790, f(x) = 5.504916e+02, ||grad||_infty = 2.79e-02
+Iter   800, f(x) = 5.504911e+02, ||grad||_infty = 9.91e-02
+Iter   810, f(x) = 5.504902e+02, ||grad||_infty = 2.42e-01
+Iter   820, f(x) = 5.504894e+02, ||grad||_infty = 6.55e-02
+Iter   830, f(x) = 5.504886e+02, ||grad||_infty = 3.77e-02
+Iter   840, f(x) = 5.504881e+02, ||grad||_infty = 1.69e-02
+Iter   850, f(x) = 5.504880e+02, ||grad||_infty = 1.85e-02
+Iter   860, f(x) = 5.504879e+02, ||grad||_infty = 8.73e-03
+Iter   870, f(x) = 5.504878e+02, ||grad||_infty = 7.87e-03
+Iter   880, f(x) = 5.504877e+02, ||grad||_infty = 8.39e-03
+Iter   890, f(x) = 5.504876e+02, ||grad||_infty = 6.39e-03
+Iter   900, f(x) = 5.504875e+02, ||grad||_infty = 2.64e-02
+Iter   906, f(x) = 5.504874e+02, ||grad||_infty = 7.51e-03
+
+exitmsg =
+
+    'CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH.'
+
+
+fit =
+
+   99.0269
+
+</pre><pre class="codeinput"><span class="comment">% Check the answer (1 is perfect)</span>
+scr = score(M_plus, M_true)
+</pre><pre class="codeoutput">
+scr =
+
+    0.8000
+
+</pre><h2 id="13">Nonnegative factorization</h2><p>We can employ lower bounds to get a nonnegative factorization.</p><h2 id="14">Create an example problem.</h2><p>Create an example 50 x 40 x 30 tensor with rank 5 and add 10% noise. We select nonnegative factor matrices and lambdas. The create_problem doesn't really know how to add noise without going negative, so we <i>hack</i> it to make the observed tensor be nonzero.</p><pre class="codeinput">R = 5;
+info = create_problem(<span class="string">'Size'</span>, [50 40 30], <span class="string">'Num_Factors'</span>, R, <span class="string">'Noise'</span>, 0.10,<span class="keyword">...</span>
+    <span class="string">'Factor_Generator'</span>, <span class="string">'rand'</span>, <span class="string">'Lambda_Generator'</span>, <span class="string">'rand'</span>);
+X = info.Data .* (info.Data &gt; 0); <span class="comment">% Force it to be nonnegative</span>
+M_true = info.Soln;
+</pre><h2 id="15">Generate initial guess of the corret size</h2><pre class="codeinput">M_init = create_guess(<span class="string">'Data'</span>, X, <span class="string">'Num_Factors'</span>, R, <span class="keyword">...</span>
+    <span class="string">'Factor_Generator'</span>, <span class="string">'rand'</span>);
+</pre><h2 id="16">Call the <tt>cp_opt_legacy</tt> method</h2><p>Here we specify a lower bound of zero with the last two arguments.</p><pre class="codeinput">[M,M0,output] = cp_opt_legacy(X, R, <span class="string">'init'</span>, M_init,<span class="string">'lower'</span>,0);
+</pre><pre class="codeoutput">Iter    10, f(x) = 7.931858e+01, ||grad||_infty = 1.19e+01
+Iter    20, f(x) = 3.180133e+01, ||grad||_infty = 1.99e+00
+Iter    30, f(x) = 2.570572e+01, ||grad||_infty = 2.00e+00
+Iter    40, f(x) = 2.292782e+01, ||grad||_infty = 1.14e+00
+Iter    50, f(x) = 2.217219e+01, ||grad||_infty = 1.04e+00
+Iter    60, f(x) = 2.177179e+01, ||grad||_infty = 1.11e+00
+Iter    70, f(x) = 2.154988e+01, ||grad||_infty = 7.88e-01
+Iter    80, f(x) = 2.145103e+01, ||grad||_infty = 6.99e-01
+Iter    90, f(x) = 2.141750e+01, ||grad||_infty = 5.78e-01
+Iter   100, f(x) = 2.138105e+01, ||grad||_infty = 1.79e-01
+Iter   110, f(x) = 2.136567e+01, ||grad||_infty = 1.85e-01
+Iter   120, f(x) = 2.134807e+01, ||grad||_infty = 8.66e-02
+Iter   130, f(x) = 2.133420e+01, ||grad||_infty = 5.54e-02
+Iter   140, f(x) = 2.132942e+01, ||grad||_infty = 4.39e-02
+Iter   150, f(x) = 2.132709e+01, ||grad||_infty = 6.41e-02
+Iter   160, f(x) = 2.132540e+01, ||grad||_infty = 6.99e-02
+Iter   170, f(x) = 2.132462e+01, ||grad||_infty = 7.59e-02
+Iter   180, f(x) = 2.132414e+01, ||grad||_infty = 6.65e-02
+Iter   190, f(x) = 2.132367e+01, ||grad||_infty = 6.93e-02
+Iter   200, f(x) = 2.132355e+01, ||grad||_infty = 7.86e-02
+Iter   210, f(x) = 2.132348e+01, ||grad||_infty = 8.06e-02
+Iter   220, f(x) = 2.132344e+01, ||grad||_infty = 7.62e-02
+Iter   230, f(x) = 2.132342e+01, ||grad||_infty = 7.22e-02
+Iter   240, f(x) = 2.132342e+01, ||grad||_infty = 6.96e-02
+Iter   250, f(x) = 2.132341e+01, ||grad||_infty = 6.94e-02
+Iter   260, f(x) = 2.132341e+01, ||grad||_infty = 6.98e-02
+Iter   270, f(x) = 2.132341e+01, ||grad||_infty = 6.91e-02
+Iter   271, f(x) = 2.132341e+01, ||grad||_infty = 6.91e-02
+</pre><h2 id="17">Check the output</h2><pre class="codeinput">exitmsg = output.ExitMsg
+</pre><pre class="codeoutput">
+exitmsg =
+
+    'CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH.'
+
+</pre><p>The fit is the percentage of the data that is explained by the model. Because we have noise, we do not expect the fit to be perfect.</p><pre class="codeinput">fit = output.Fit
+</pre><pre class="codeoutput">
+fit =
+
+   99.0351
+
+</pre><h2 id="19">Evaluate the output</h2><p>We can "score" the similarity of the model computed by CP and compare that with the truth. The <tt>score</tt> function on ktensor's gives a score in [0,1]  with 1 indicating a perfect match. Because we have noise, we do not expect the fit to be perfect. See <a href="matlab:doc('ktensor/score')">doc score</a> for more details.</p><pre class="codeinput">scr = score(M,M_true)
+</pre><pre class="codeoutput">
+scr =
+
+    0.9752
+
+</pre><p class="footer">Tensor Toolbox for MATLAB: <a href="index.html">www.tensortoolbox.org</a>.</p></div><!--
+##### SOURCE BEGIN #####
+%% All-at-once optimization for CP tensor decomposition
+%
+% <html>
+% <p class="navigate">
+% &#62;&#62; <a href="index.html">Tensor Toolbox</a> 
+% &#62;&#62; <a href="cp.html">CP Decompositions</a> 
+% &#62;&#62; <a href="cp_opt_doc.html">CP-OPT</a> 
+% &#62;&#62; <a href="cp_opt_legacy_doc.html">CP-OPT (legacy)</a>
+% </p>
+% </html>
+%
+% We explain how to use |cp_opt_legacy| function which implements the *CP-OPT*
+% method that fits the CP model using _direct_ or _all-at-once_
+% optimization. This is in contrast to the |cp_als| function which
+% implements the *CP-ALS* that fits the CP model using _alternating_ 
+% optimization. The CP-OPT method is described in the
+% following reference: 
+%
+% * E. Acar, D. M. Dunlavy and T. G. Kolda, A Scalable
+% Optimization Approach for Fitting Canonical Tensor Decompositions,
+% J. Chemometrics, 25(2):67-86, 2011,
+% <http://doi.org/10.1002/cem.1335>
+
+%% Newer version available
+% This documentation is for the legacy implementation of CP-OPT. We
+% recommend using the newer version, described <cp_opt_doc.html here>.
+
+%% Third-party optimization software
+% The |cp_opt_legacy| method uses third-party optimization software to do the
+% optimization. You can use either 
+%
+% * <https://github.com/stephenbeckr/L-BFGS-B-C *L-BFGS-B* by Stephen Becker> 
+% (preferred), or
+% * <https://software.sandia.gov/trac/poblano *POBLANO* Version 1.1 by
+% Evrim Acar, Daniel Dunlavy, and Tamara Kolda>.
+%
+% The remainder of these instructions assume L-BFGS-B is being used. See
+% <cp_opt_legacy_poblano_doc.html here> for instructions on using |cp_opt_legacy| with
+% Poblano.
+
+%% Check that the software is installed. 
+% Be sure that lbfgsb is in your path.
+help lbfgsb
+
+%% Create an example problem. 
+% Create an example 50 x 40 x 30 tensor with rank 5 and add 10% noise.
+rng('default'); %<- Setting random seed for reproducibility of this script
+R = 5;
+info = create_problem('Size', [50 40 30], 'Num_Factors', R, 'Noise', 0.10);
+X = info.Data;
+M_true = info.Soln;
+
+%% Create initial guess using 'nvecs'
+M_init = create_guess('Data', X, 'Num_Factors', R, 'Factor_Generator', 'nvecs');
+
+%% Call the |cp_opt_legacy| method
+% Here is an example call to the |cp_opt_legacy| method. By default, each iteration
+% prints the least squares fit function value (being minimized) and the
+% norm of the gradient. 
+
+[M,M0,output] = cp_opt_legacy(X, R, 'init', M_init);
+
+%% Check the output
+% It's important to check the output of the optimization method. In
+% particular, it's worthwhile to check the exit message. 
+% The message |CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH| means that
+% it has converged because the function value stopped improving.
+exitmsg = output.ExitMsg
+
+%%
+% The fit is the percentage of the data that is explained by the model.
+% Because we have noise, we do not expect the fit to be perfect.
+fit = output.Fit
+
+%% Evaluate the output
+% We can "score" the similarity of the model computed by CP and compare
+% that with the truth. The |score| function on ktensor's gives a score in
+% [0,1]  with 1 indicating a perfect match. Because we have noise, we do
+% not expect the fit to be perfect. See <matlab:doc('ktensor/score') doc
+% score> for more details.
+scr = score(M,M_true)
+
+%% Overfitting example
+% Re-using the same example as before, consider the case where we don't
+% know R in advance. We might guess too high. Here we show a case where we
+% guess R+1 factors rather than R. 
+
+% Generate initial guess of the corret size
+M_plus_init = create_guess('Data', X, 'Num_Factors', R+1, ...
+    'Factor_Generator', 'nvecs');
+
+%%
+
+% Run the algorithm
+[M_plus,~,output] = cp_opt_legacy(X, R+1, 'init', M_plus_init);
+exitmsg = output.ExitMsg
+fit = output.Fit
+
+%%
+
+% Check the answer (1 is perfect)
+scr = score(M_plus, M_true)
+
+%% Nonnegative factorization
+% We can employ lower bounds to get a nonnegative factorization.
+
+%% Create an example problem. 
+% Create an example 50 x 40 x 30 tensor with rank 5 and add 10% noise. We
+% select nonnegative factor matrices and lambdas. The
+% create_problem doesn't really know how to add noise without going
+% negative, so we _hack_ it to make the observed tensor be nonzero.
+R = 5;
+info = create_problem('Size', [50 40 30], 'Num_Factors', R, 'Noise', 0.10,...
+    'Factor_Generator', 'rand', 'Lambda_Generator', 'rand');
+X = info.Data .* (info.Data > 0); % Force it to be nonnegative
+M_true = info.Soln;
+
+%% Generate initial guess of the corret size
+M_init = create_guess('Data', X, 'Num_Factors', R, ...
+    'Factor_Generator', 'rand');
+%% Call the |cp_opt_legacy| method
+% Here we specify a lower bound of zero with the last two arguments.
+[M,M0,output] = cp_opt_legacy(X, R, 'init', M_init,'lower',0);
+
+%% Check the output
+exitmsg = output.ExitMsg
+
+%%
+% The fit is the percentage of the data that is explained by the model.
+% Because we have noise, we do not expect the fit to be perfect.
+fit = output.Fit
+
+%% Evaluate the output
+% We can "score" the similarity of the model computed by CP and compare
+% that with the truth. The |score| function on ktensor's gives a score in
+% [0,1]  with 1 indicating a perfect match. Because we have noise, we do
+% not expect the fit to be perfect. See <matlab:doc('ktensor/score') doc
+% score> for more details.
+scr = score(M,M_true)
+
+##### SOURCE END #####
+--></body></html>

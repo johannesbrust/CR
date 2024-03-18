@@ -1,0 +1,447 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>All-at-once optimization for CP tensor decomposition (with Poblano)</title><meta name="generator" content="MATLAB 9.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-08-16"><meta name="DC.source" content="cp_opt_legacy_poblano_doc.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:90%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:12px; color:#000; line-height:140%; background:#fff none; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:2.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+.banner{ background-color:#15243c; text-align:center;}
+.navigate {font-size:0.8em; padding:0px; line-height:100%; }
+
+pre, code { font-size:14px; }
+tt { font-size: 1.0em; font-weight:bold; background:#f7f7f7; padding-right:5px; padding-left:5px }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:20px 0px 0px; border-top:1px dotted #878787; font-size:0.9em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; padding:0px 20px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="banner"><a href="index.html"><img src="Tensor-Toolbox-for-MATLAB-Banner.png"></a></div><div class="content"><h1>All-at-once optimization for CP tensor decomposition (with Poblano)</h1><!--introduction--><p>We explain how to use <tt>cp_opt_legacy</tt> with the Poblano toolbox. The default is to use L-BFGS-B (not Poblano), which is described <a href="cp_opt_legacy_doc.html">here</a>.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Newer version available</a></li><li><a href="#2">Poblano Optimization Toolbox</a></li><li><a href="#3">Create an example problem.</a></li><li><a href="#4">Create initial guess using 'nvecs'</a></li><li><a href="#5">Set up the optimization parameters</a></li><li><a href="#6">Call the <tt>cp_opt_legacy</tt> method</a></li><li><a href="#7">Check the output</a></li><li><a href="#9">Evaluate the output</a></li><li><a href="#10">Overfitting example</a></li></ul></div><h2 id="1">Newer version available</h2><p>This documentation is for the legacy implementation of CP-OPT. We recommend using the newer version, described <a href="cp_opt_doc.html">here</a>.</p><h2 id="2">Poblano Optimization Toolbox</h2><p>Check that you have Poblano 1.1 (or later) installed. The output of your 'ver' command should look something like the following.</p><pre class="codeinput">ver
+</pre><pre class="codeoutput">-----------------------------------------------------------------------------------------------------
+MATLAB Version: 9.11.0.1873467 (R2021b) Update 3
+MATLAB License Number: 40941043
+Operating System: Microsoft Windows 11 Pro Version 10.0 (Build 22000)
+Java Version: Java 1.8.0_202-b08 with Oracle Corporation Java HotSpot(TM) 64-Bit Server VM mixed mode
+-----------------------------------------------------------------------------------------------------
+MATLAB                                                Version 9.11        (R2021b) 
+Deep Learning Toolbox                                 Version 14.3        (R2021b) 
+Image Processing Toolbox                              Version 11.4        (R2021b) 
+Mapping Toolbox                                       Version 5.2         (R2021b) 
+Optimization Toolbox                                  Version 9.2         (R2021b) 
+Parallel Computing Toolbox                            Version 7.5         (R2021b) 
+Poblano Toolbox (Sandia National Labs)                Version 1.2                  
+Statistics and Machine Learning Toolbox               Version 12.2        (R2021b) 
+Symbolic Math Toolbox                                 Version 9.0         (R2021b) 
+Tensor Toolbox (Sandia National Labs)                 Version 3.3.a-dev    (R2022a)
+Text Analytics Toolbox                                Version 1.8         (R2021b) 
+Wavelet Toolbox                                       Version 6.0         (R2021b) 
+</pre><h2 id="3">Create an example problem.</h2><p>Create an example 50 x 40 x 30 tensor with rank 5 and add 10% noise.</p><pre class="codeinput">rng(<span class="string">'default'</span>); <span class="comment">%&lt;- Setting random seed for reproducibility of this script</span>
+R = 5;
+info = create_problem(<span class="string">'Size'</span>, [50 40 30], <span class="string">'Num_Factors'</span>, R, <span class="string">'Noise'</span>, 0.10);
+X = info.Data;
+M_true = info.Soln;
+</pre><h2 id="4">Create initial guess using 'nvecs'</h2><pre class="codeinput">M_init = create_guess(<span class="string">'Data'</span>, X, <span class="string">'Num_Factors'</span>, R, <span class="keyword">...</span>
+    <span class="string">'Factor_Generator'</span>, <span class="string">'nvecs'</span>);
+</pre><h2 id="5">Set up the optimization parameters</h2><p>It's genearlly a good idea to consider the parameters of the optimization method. The default options may be either too stringent or not stringent enough. The most important options to consider are detailed here.</p><pre class="codeinput"><span class="comment">% Get the defaults</span>
+ncg_opts = ncg(<span class="string">'defaults'</span>);
+<span class="comment">% Tighten the stop tolerance (norm of gradient). This is often too large.</span>
+ncg_opts.StopTol = 1.0e-6;
+<span class="comment">% Tighten relative change in function value tolearnce. This is often too large.</span>
+ncg_opts.RelFuncTol = 1.0e-20;
+<span class="comment">% Increase the number of iterations.</span>
+ncg_opts.MaxIters = 10^4;
+<span class="comment">% Only display every 10th iteration</span>
+ncg_opts.DisplayIters = 10;
+<span class="comment">% Display the final set of options</span>
+ncg_opts
+</pre><pre class="codeoutput">
+ncg_opts = 
+
+  struct with fields:
+
+                   Display: 'iter'
+              DisplayIters: 10
+           LineSearch_ftol: 1.0000e-04
+           LineSearch_gtol: 0.0100
+    LineSearch_initialstep: 1
+         LineSearch_maxfev: 20
+         LineSearch_method: 'more-thuente'
+         LineSearch_stpmax: 1.0000e+15
+         LineSearch_stpmin: 1.0000e-15
+           LineSearch_xtol: 1.0000e-15
+              MaxFuncEvals: 10000
+                  MaxIters: 10000
+                RelFuncTol: 1.0000e-20
+              RestartIters: 20
+                 RestartNW: 0
+              RestartNWTol: 0.1000
+                   StopTol: 1.0000e-06
+                 TraceFunc: 0
+            TraceFuncEvals: 0
+                 TraceGrad: 0
+             TraceGradNorm: 0
+              TraceRelFunc: 0
+                    TraceX: 0
+                    Update: 'PR'
+
+</pre><h2 id="6">Call the <tt>cp_opt_legacy</tt> method</h2><p>Here is an example call to the cp_opt_legacy method. By default, each iteration prints the least squares fit function value (being minimized) and the norm of the gradient. The meaning of any line search warnings can be checked via <a href="matlab:doc('cvsrch')">doc cvsrch</a>.</p><pre class="codeinput">[M,~,output] = cp_opt_legacy(X, R, <span class="string">'init'</span>, M_init, <span class="keyword">...</span>
+    <span class="string">'opt'</span>, <span class="string">'ncg'</span>, <span class="string">'opt_options'</span>, ncg_opts);
+</pre><pre class="codeoutput"> Iter  FuncEvals       F(X)          ||G(X)||/N        
+------ --------- ---------------- ----------------
+     0         1   56854.34228466       0.73889204
+    10        74     560.29237101       0.16300955
+    20       112     555.75709148       0.01918674
+    30       151     555.35904396       0.03192486
+    40       197     554.86989841       0.02453038
+    50       232     554.60386950       0.02480723
+    60       278     554.20899944       0.01806078
+    70       314     554.02850123       0.01538631
+    80       361     553.85012049       0.01281683
+    90       393     553.77782494       0.00940403
+   100       430     553.70149389       0.01093787
+   110       460     553.65835815       0.00742205
+   120       502     553.60426584       0.00672556
+   130       535     553.57456837       0.00716477
+   140       573     553.54912769       0.00722112
+   150       602     553.53638723       0.00491183
+   160       643     553.50901424       0.00771484
+   170       674     553.49543150       0.00529711
+   180       711     553.47556496       0.00555256
+   190       741     553.46331427       0.00427601
+   200       782     553.42704100       0.01005031
+   210       810     553.40560402       0.00514693
+   220       845     553.38994007       0.00366819
+   230       875     553.38210100       0.00463339
+   240       915     553.35647341       0.00945372
+   250       943     553.33916747       0.00490671
+   260       976     553.32642617       0.00409114
+   270      1004     553.32141282       0.00365606
+   280      1042     553.30667908       0.00489423
+   290      1069     553.29806451       0.00440921
+   300      1098     553.29113580       0.00322205
+   310      1124     553.28734544       0.00291091
+   320      1159     553.27683196       0.00513674
+   330      1185     553.27171789       0.00190590
+   340      1213     553.26887365       0.00168944
+   350      1235     553.26750075       0.00202764
+   360      1264     553.26520481       0.00205382
+   370      1288     553.26396789       0.00118306
+   380      1313     553.26303978       0.00103313
+   390      1336     553.26245272       0.00090600
+   400      1365     553.26095190       0.00251028
+   410      1387     553.26027289       0.00056015
+   420      1410     553.26000008       0.00024910
+   430      1434     553.25982687       0.00052903
+   440      1461     553.25942739       0.00108626
+   450      1484     553.25916245       0.00036871
+   460      1508     553.25905558       0.00056165
+   470      1529     553.25898884       0.00032671
+   480      1553     553.25889059       0.00060876
+   490      1574     553.25882766       0.00032151
+   500      1596     553.25876444       0.00023671
+   510      1618     553.25872303       0.00033837
+   520      1644     553.25862132       0.00054118
+   530      1664     553.25854497       0.00028158
+   540      1686     553.25847388       0.00037617
+   550      1706     553.25843771       0.00022447
+   560      1729     553.25837133       0.00021679
+   570      1750     553.25829606       0.00012975
+   580      1785     553.25685112       0.00119009
+   590      1811     553.25583438       0.00062378
+   600      1833     553.25570368       0.00034460
+   610      1854     553.25565513       0.00030809
+   620      1881     553.25553904       0.00041974
+   630      1902     553.25548356       0.00026437
+   640      1926     553.25544371       0.00023281
+   650      1946     553.25542085       0.00020827
+   660      1972     553.25536368       0.00042064
+   670      1993     553.25532712       0.00015715
+   680      2013     553.25529804       0.00017142
+   690      2034     553.25527498       0.00022332
+   700      2058     553.25520793       0.00065962
+   710      2079     553.25515381       0.00014658
+   720      2103     553.25512827       0.00019213
+   730      2124     553.25511761       0.00014752
+   740      2148     553.25509165       0.00019916
+   750      2169     553.25507415       0.00017411
+   760      2191     553.25505347       0.00019845
+   770      2211     553.25503991       0.00016042
+   780      2234     553.25501109       0.00027521
+   790      2254     553.25499230       0.00013643
+   800      2274     553.25497366       0.00015664
+   810      2294     553.25496352       0.00014402
+   820      2315     553.25494449       0.00020764
+   830      2335     553.25493315       0.00013404
+   840      2355     553.25492028       0.00009366
+   850      2375     553.25491087       0.00014055
+   860      2397     553.25487921       0.00038256
+   870      2419     553.25485605       0.00008978
+   880      2439     553.25484348       0.00004687
+   890      2459     553.25483328       0.00010907
+   900      2482     553.25479714       0.00049832
+   910      2502     553.25476720       0.00010257
+   920      2525     553.25473442       0.00038630
+   930      2545     553.25471159       0.00008553
+   940      2568     553.25470406       0.00010964
+   950      2590     553.25469722       0.00008719
+   960      2615     553.25467640       0.00020325
+   970      2637     553.25465924       0.00010910
+   980      2659     553.25465415       0.00007850
+   990      2681     553.25464979       0.00007725
+  1000      2707     553.25463371       0.00015462
+  1010      2729     553.25462078       0.00008769
+  1020      2750     553.25461714       0.00006284
+  1030      2772     553.25461466       0.00006613
+  1040      2798     553.25459825       0.00011030
+  1050      2821     553.25458631       0.00007644
+  1060      2841     553.25458426       0.00004516
+  1070      2861     553.25458259       0.00007473
+  1080      2885     553.25457317       0.00014742
+  1090      2905     553.25456670       0.00008952
+  1100      2925     553.25456407       0.00004139
+  1110      2945     553.25456311       0.00005391
+  1120      2970     553.25455730       0.00015353
+  1130      2990     553.25455358       0.00006328
+  1140      3010     553.25455235       0.00003214
+  1150      3030     553.25455207       0.00003521
+  1160      3055     553.25454938       0.00010005
+  1170      3075     553.25454778       0.00003822
+  1180      3095     553.25454697       0.00001848
+  1190      3117     553.25454661       0.00002347
+  1200      3141     553.25454050       0.00017036
+  1210      3161     553.25453748       0.00001725
+  1220      3181     553.25453722       0.00001960
+  1230      3201     553.25453716       0.00001126
+  1240      3223     553.25453690       0.00002290
+  1250      3243     553.25453672       0.00001412
+  1260      3263     553.25453662       0.00001600
+  1270      3283     553.25453655       0.00000855
+  1280      3305     553.25453640       0.00001281
+  1290      3325     553.25453625       0.00000304
+  1300      3346     553.25453584       0.00000693
+  1310      3366     553.25453550       0.00000215
+  1320      3388     553.25453523       0.00000437
+  1330      3408     553.25453501       0.00000186
+  1340      3428     553.25453497       0.00000191
+  1350      3448     553.25453492       0.00000141
+  1360      3469     553.25453477       0.00000349
+  1370      3489     553.25453464       0.00000227
+  1380      3509     553.25453460       0.00000174
+  1390      3529     553.25453457       0.00000172
+  1400      3550     553.25453447       0.00000432
+  1410      3570     553.25453438       0.00000233
+  1420      3590     553.25453435       0.00000194
+  1430      3610     553.25453433       0.00000125
+  1440      3630     553.25453426       0.00000277
+  1450      3650     553.25453419       0.00000122
+  1460      3670     553.25453417       0.00000133
+  1461      3672     553.25453417       0.00000079
+</pre><h2 id="7">Check the output</h2><p>It's important to check the output of the optimization method. In particular, it's worthwhile to check the exit flag. A zero (0) indicates successful termination with the gradient smaller than the specified StopTol, and a three (3) indicates a successful termination where the change in function value is less than RelFuncTol. The meaning of any other flags can be checked via <a href="matlab:doc('poblano_params')">doc poblano_params</a>.</p><pre class="codeinput">exitflag = output.ExitFlag
+</pre><pre class="codeoutput">
+exitflag =
+
+     0
+
+</pre><p>The fit is the percentage of the data that is explained by the model. Because we have noise, we do not expect the fit to be perfect.</p><pre class="codeinput">fit = output.Fit
+</pre><pre class="codeoutput">
+fit =
+
+   99.0220
+
+</pre><h2 id="9">Evaluate the output</h2><p>We can "score" the similarity of the model computed by CP and compare that with the truth. The <tt>score</tt> function on ktensor's gives a score in [0,1]  with 1 indicating a perfect match. Because we have noise, we do not expect the fit to be perfect. See <a href="matlab:doc('ktensor/score')">doc score</a> for more details.</p><pre class="codeinput">scr = score(M,M_true)
+</pre><pre class="codeoutput">
+scr =
+
+    0.7998
+
+</pre><h2 id="10">Overfitting example</h2><p>Consider the case where we don't know R in advance. We might guess too high. Here we show a case where we guess R+1 factors rather than R.</p><pre class="codeinput"><span class="comment">% Generate initial guess of the corret size</span>
+M_plus_init = create_guess(<span class="string">'Data'</span>, X, <span class="string">'Num_Factors'</span>, R+1, <span class="keyword">...</span>
+    <span class="string">'Factor_Generator'</span>, <span class="string">'nvecs'</span>);
+</pre><pre class="codeinput"><span class="comment">% Loosen the stop tolerance (norm of gradient).</span>
+ncg_opts.StopTol = 1.0e-2;
+</pre><pre class="codeinput"><span class="comment">% Run the algorithm</span>
+[M_plus,~,output] = cp_opt_legacy(X, R+1, <span class="string">'init'</span>, M_plus_init, <span class="keyword">...</span>
+    <span class="string">'opt'</span>, <span class="string">'ncg'</span>, <span class="string">'opt_options'</span>, ncg_opts);
+exitflag = output.ExitFlag
+fit = output.Fit
+</pre><pre class="codeoutput"> Iter  FuncEvals       F(X)          ||G(X)||/N        
+------ --------- ---------------- ----------------
+     0         1   56854.95767322       0.61575601
+    10        74     560.53901958       0.13589655
+    15        95     556.07779574       0.00781867
+
+exitflag =
+
+     0
+
+
+fit =
+
+   99.0170
+
+</pre><pre class="codeinput"><span class="comment">% Check the answer (1 is perfect)</span>
+scr = score(M_plus, M_true)
+</pre><pre class="codeoutput">
+scr =
+
+    0.7998
+
+</pre><p class="footer">Tensor Toolbox for MATLAB: <a href="index.html">www.tensortoolbox.org</a>.</p></div><!--
+##### SOURCE BEGIN #####
+%% All-at-once optimization for CP tensor decomposition (with Poblano)
+% We explain how to use |cp_opt_legacy| with the Poblano toolbox. The default is
+% to use L-BFGS-B (not Poblano), which is described <cp_opt_legacy_doc.html here>.
+
+%% Newer version available
+% This documentation is for the legacy implementation of CP-OPT. We
+% recommend using the newer version, described <cp_opt_doc.html here>.
+
+%% Poblano Optimization Toolbox
+% Check that you have Poblano 1.1 (or later) installed. The output of your 'ver'
+% command should look something like the following.
+ver
+
+%% Create an example problem. 
+% Create an example 50 x 40 x 30 tensor with rank 5 and add 10% noise.
+rng('default'); %<- Setting random seed for reproducibility of this script
+R = 5;
+info = create_problem('Size', [50 40 30], 'Num_Factors', R, 'Noise', 0.10);
+X = info.Data;
+M_true = info.Soln;
+
+%% Create initial guess using 'nvecs'
+M_init = create_guess('Data', X, 'Num_Factors', R, ...
+    'Factor_Generator', 'nvecs');
+
+
+%% Set up the optimization parameters
+% It's genearlly a good idea to consider the parameters of the optimization
+% method. The default options may be either too stringent or not stringent
+% enough. The most important options to consider are detailed here. 
+
+% Get the defaults
+ncg_opts = ncg('defaults');
+% Tighten the stop tolerance (norm of gradient). This is often too large.
+ncg_opts.StopTol = 1.0e-6;
+% Tighten relative change in function value tolearnce. This is often too large.
+ncg_opts.RelFuncTol = 1.0e-20;
+% Increase the number of iterations. 
+ncg_opts.MaxIters = 10^4;
+% Only display every 10th iteration
+ncg_opts.DisplayIters = 10;
+% Display the final set of options
+ncg_opts
+
+%% Call the |cp_opt_legacy| method
+% Here is an example call to the cp_opt_legacy method. By default, each iteration
+% prints the least squares fit function value (being minimized) and the
+% norm of the gradient. The meaning of any line search warnings
+% can be checked via <matlab:doc('cvsrch') doc cvsrch>.
+[M,~,output] = cp_opt_legacy(X, R, 'init', M_init, ...
+    'opt', 'ncg', 'opt_options', ncg_opts);
+
+%% Check the output
+% It's important to check the output of the optimization method. In
+% particular, it's worthwhile to check the exit flag. 
+% A zero (0) indicates successful termination with the gradient smaller
+% than the specified StopTol, and a three (3) indicates a successful
+% termination where the change in function value is less than RelFuncTol.
+% The meaning of any other flags can be checked via 
+% <matlab:doc('poblano_params') doc poblano_params>. 
+exitflag = output.ExitFlag
+
+%%
+% The fit is the percentage of the data that is explained by the model.
+% Because we have noise, we do not expect the fit to be perfect.
+fit = output.Fit
+
+%% Evaluate the output
+% We can "score" the similarity of the model computed by CP and compare
+% that with the truth. The |score| function on ktensor's gives a score in
+% [0,1]  with 1 indicating a perfect match. Because we have noise, we do
+% not expect the fit to be perfect. See <matlab:doc('ktensor/score') doc
+% score> for more details.
+scr = score(M,M_true)
+
+%% Overfitting example
+% Consider the case where we don't know R in advance. We might guess too
+% high. Here we show a case where we guess R+1 factors rather than R.
+
+% Generate initial guess of the corret size
+M_plus_init = create_guess('Data', X, 'Num_Factors', R+1, ...
+    'Factor_Generator', 'nvecs');
+
+%% 
+
+% Loosen the stop tolerance (norm of gradient). 
+ncg_opts.StopTol = 1.0e-2;
+
+%%
+
+% Run the algorithm
+[M_plus,~,output] = cp_opt_legacy(X, R+1, 'init', M_plus_init, ...
+    'opt', 'ncg', 'opt_options', ncg_opts);
+exitflag = output.ExitFlag
+fit = output.Fit
+
+
+%%
+
+% Check the answer (1 is perfect)
+scr = score(M_plus, M_true)
+
+
+##### SOURCE END #####
+--></body></html>

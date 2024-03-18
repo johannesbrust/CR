@@ -1,0 +1,269 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Partial Reconstruction of a Tucker Tensor</title><meta name="generator" content="MATLAB 9.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-08-15"><meta name="DC.source" content="ttensor_reconstruct_doc.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:90%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:12px; color:#000; line-height:140%; background:#fff none; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:2.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+.banner{ background-color:#15243c; text-align:center;}
+.navigate {font-size:0.8em; padding:0px; line-height:100%; }
+
+pre, code { font-size:14px; }
+tt { font-size: 1.0em; font-weight:bold; background:#f7f7f7; padding-right:5px; padding-left:5px }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:20px 0px 0px; border-top:1px dotted #878787; font-size:0.9em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; padding:0px 20px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="banner"><a href="index.html"><img src="Tensor-Toolbox-for-MATLAB-Banner.png"></a></div><div class="content"><h1>Partial Reconstruction of a Tucker Tensor</h1><!--introduction--><p>
+<p class="navigate">
+&#62;&#62; <a href="index.html">Tensor Toolbox</a>
+&#62;&#62; <a href="tucker.html">Tucker Decompositions</a>
+&#62;&#62; <a href="ttensor_reconstruct.html">Partial Reconstruction</a>
+</p>
+</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Benefits of Partial Reconstruction</a></li><li><a href="#2">Load Miranda density tensor</a></li><li><a href="#3">Compute HOSVD</a></li><li><a href="#4">Full reconstruction</a></li><li><a href="#5">Partial reconstruction</a></li><li><a href="#6">Down-sampling</a></li><li><a href="#7">Compare visualizations</a></li></ul></div><h2 id="1">Benefits of Partial Reconstruction</h2><p>An advantage of Tucker decomposition is that the tensor can be partially reconstructed without ever forming the <i>full</i> tensor. The <tt>reconstruct</tt> function does this, resulting in significant time and memory savings, as we demonstrate below.</p><h2 id="2">Load Miranda density tensor</h2><p>The Miranda data is available at <a href="https://gitlab.com/tensors/tensor_data_miranda_sim">https://gitlab.com/tensors/tensor_data_miranda_sim</a>. It loads a tensor <tt>X</tt> of size <tt>384 x 384 x 256</tt>.</p><pre class="codeinput">load(<span class="string">'../../tensor_data_miranda_sim/density.mat'</span>);
+size(X)
+</pre><pre class="codeoutput">
+ans =
+
+   384   384   256
+
+</pre><h2 id="3">Compute HOSVD</h2><p>We compute the Tucker decomposition using ST-HOSVD with target relative error 0.001.</p><pre class="codeinput">tic
+T = hosvd(X,0.001);
+hosvdtime = toc;
+fprintf(<span class="string">'Time to compute HOSVD: %0.2f sec\n'</span>, hosvdtime);
+fprintf(<span class="string">'\tCompression: %d X\n'</span>, round(whos(<span class="string">'X'</span>).bytes/whos(<span class="string">'T'</span>).bytes));
+</pre><pre class="codeoutput">Computing HOSVD...
+Size of core: 101 x 102 x 26
+||X-T||/||X|| = 0.000932816 &lt;=0.001000 (tol)
+
+Time to compute HOSVD: 0.88 sec
+	Compression: 107 X
+</pre><h2 id="4">Full reconstruction</h2><p>We can create a full reconstruction of the data using the <tt>full</tt> command. Not only is this expensive in computational time but also in memory. Now, let's see how long it takes to reconstruct the approximation to X.</p><pre class="codeinput">tic
+Xf = full(T);
+fulltime = toc;
+fprintf(<span class="string">'Time to reconstruct entire tensor: %0.2f sec\n'</span>, fulltime);
+</pre><pre class="codeoutput">Time to reconstruct entire tensor: 0.16 sec
+</pre><h2 id="5">Partial reconstruction</h2><p>If we really only want part of the tensor, we can reconstruct just that part. Suppose we only want the <tt>(:,150,:)</tt> slice. The <tt>reconstruct</tt> function can do this much more efficiently with no loss in accuracy.</p><pre class="codeinput">tic
+Xslice = reconstruct(T,2,150);
+slicetime = toc;
+fprintf(<span class="string">'Time to reconstruct specific slice: %0.2f sec\n'</span>, slicetime);
+fprintf(<span class="string">'\tSpeedup compared to full recontruction: %d X\n'</span>, round(fulltime/slicetime));
+fprintf(<span class="string">'\tMemory savings versus full reconstruction: %d X\n'</span>,<span class="keyword">...</span>
+    round(whos(<span class="string">'Xf'</span>).bytes/whos(<span class="string">'Xslice'</span>).bytes));
+fprintf(<span class="string">'\tRel. error versus full reconstruction: %g\n'</span>,norm(squeeze(Xslice)-Xf(:,150,:))/norm(squeeze(Xslice)));
+</pre><pre class="codeoutput">Time to reconstruct specific slice: 0.01 sec
+	Speedup compared to full recontruction: 14 X
+	Memory savings versus full reconstruction: 384 X
+	Rel. error versus full reconstruction: 6.60045e-16
+</pre><h2 id="6">Down-sampling</h2><p>Additionally, we may want to downsample high-dimensional data to something lower resolution. For example, here we downsample in modes 1 and 2 by a factor of 2 and see even further speed-up and memory savings. There is no loss of accuarcy as compared to downsampling after constructing the full tensor.</p><pre class="codeinput">S1 = kron(eye(384/2),0.5*ones(1,2));
+S3 = kron(eye(256/2),0.5*ones(1,2));
+tic
+Xds = reconstruct(T,1,S1,2,150,3,S3);
+downslicetime = toc;
+fprintf(<span class="string">'Time to reconstruct downsampled slice: %0.2f sec\n'</span>, downslicetime);
+fprintf(<span class="string">'\tSpeedup compared to full recontruction: %d X\n'</span>, round(fulltime/downslicetime));
+fprintf(<span class="string">'\tMemory savings versus full reconstruction: %d X\n'</span>,<span class="keyword">...</span>
+    round(whos(<span class="string">'Xf'</span>).bytes/whos(<span class="string">'Xds'</span>).bytes));
+</pre><pre class="codeoutput">Time to reconstruct downsampled slice: 0.01 sec
+	Speedup compared to full recontruction: 29 X
+	Memory savings versus full reconstruction: 1533 X
+</pre><h2 id="7">Compare visualizations</h2><p>We can compare the results of reconstruction. There is no degredation in doing only a partial reconstruction. Downsampling is obviously lower resolution, but the same result as first doing the full reconstruction and then downsampling.</p><pre class="codeinput">figure(1);
+
+subplot(2,2,1)
+imagesc(rot90(squeeze(double(X(:,150,:)))),[1 3])
+axis <span class="string">equal</span>
+axis <span class="string">off</span>
+colormap(<span class="string">"jet"</span>)
+title(<span class="string">'Original Slice'</span>)
+
+subplot(2,2,2)
+imagesc(rot90(squeeze(double(Xf(:,150,:)))),[1 3])
+axis <span class="string">equal</span>
+axis <span class="string">off</span>
+title(<span class="string">'Full Reconstruction'</span>)
+
+subplot(2,2,3)
+imagesc(rot90(squeeze(double(Xslice))),[1 3])
+axis <span class="string">equal</span>
+axis <span class="string">off</span>
+title(<span class="string">'Partial Reconstruction'</span>)
+xl = xlim;
+yl = ylim;
+
+subplot(2,2,4)
+imagesc(rot90(squeeze(double(Xds))),[1 3])
+xlim(xl);
+ylim(yl);
+axis <span class="string">equal</span>
+axis <span class="string">off</span>
+title(<span class="string">'Partial+Downsampled Reconstruction'</span>)
+</pre><img vspace="5" hspace="5" src="ttensor_reconstruct_doc_01.png" alt=""> <p class="footer">Tensor Toolbox for MATLAB: <a href="index.html">www.tensortoolbox.org</a>.</p></div><!--
+##### SOURCE BEGIN #####
+%% Partial Reconstruction of a Tucker Tensor
+%
+% <html>
+% <p class="navigate">
+% &#62;&#62; <a href="index.html">Tensor Toolbox</a> 
+% &#62;&#62; <a href="tucker.html">Tucker Decompositions</a> 
+% &#62;&#62; <a href="ttensor_reconstruct.html">Partial Reconstruction</a>
+% </p>
+% </html>
+%
+
+%% Benefits of Partial Reconstruction
+% An advantage of Tucker decomposition is that the tensor can be partially
+% reconstructed without ever forming the _full_ tensor. The |reconstruct|
+% function does this, resulting in significant time and memory savings, as
+% we demonstrate below. 
+
+%% Load Miranda density tensor
+% The Miranda data is available at
+% https://gitlab.com/tensors/tensor_data_miranda_sim. 
+% It loads a tensor |X| of size |384 x 384 x 256|.
+
+load('../../tensor_data_miranda_sim/density.mat');
+size(X)
+
+%% Compute HOSVD
+% We compute the Tucker decomposition using ST-HOSVD with target relative
+% error 0.001. 
+tic
+T = hosvd(X,0.001);
+hosvdtime = toc;
+fprintf('Time to compute HOSVD: %0.2f sec\n', hosvdtime);
+fprintf('\tCompression: %d X\n', round(whos('X').bytes/whos('T').bytes));
+%% Full reconstruction 
+% We can create a full reconstruction of the data using the |full| command.
+% Not only is this expensive in computational time but also in memory.
+% Now, let's see how long it takes to reconstruct the approximation to X.
+tic
+Xf = full(T);
+fulltime = toc;
+fprintf('Time to reconstruct entire tensor: %0.2f sec\n', fulltime);
+
+%% Partial reconstruction
+% If we really only want part of the tensor, we can reconstruct just that
+% part. Suppose we only want the |(:,150,:)| slice. The |reconstruct|
+% function can do this much more efficiently with no loss in accuracy.
+tic
+Xslice = reconstruct(T,2,150);
+slicetime = toc;
+fprintf('Time to reconstruct specific slice: %0.2f sec\n', slicetime);
+fprintf('\tSpeedup compared to full recontruction: %d X\n', round(fulltime/slicetime));
+fprintf('\tMemory savings versus full reconstruction: %d X\n',...
+    round(whos('Xf').bytes/whos('Xslice').bytes));
+fprintf('\tRel. error versus full reconstruction: %g\n',norm(squeeze(Xslice)-Xf(:,150,:))/norm(squeeze(Xslice)));
+
+%% Down-sampling
+% Additionally, we may want to downsample high-dimensional data to
+% something lower resolution. For example, here we downsample in modes 1
+% and 2 by a factor of 2 and see even further speed-up and memory savings.
+% There is no loss of accuarcy as compared to downsampling after
+% constructing the full tensor.
+S1 = kron(eye(384/2),0.5*ones(1,2));
+S3 = kron(eye(256/2),0.5*ones(1,2));
+tic
+Xds = reconstruct(T,1,S1,2,150,3,S3);
+downslicetime = toc;
+fprintf('Time to reconstruct downsampled slice: %0.2f sec\n', downslicetime);
+fprintf('\tSpeedup compared to full recontruction: %d X\n', round(fulltime/downslicetime));
+fprintf('\tMemory savings versus full reconstruction: %d X\n',...
+    round(whos('Xf').bytes/whos('Xds').bytes));
+
+
+
+%% Compare visualizations
+% We can compare the results of reconstruction. There is no degredation in
+% doing only a partial reconstruction. Downsampling is obviously lower
+% resolution, but the same result as first doing the full reconstruction
+% and then downsampling.
+
+figure(1);
+
+subplot(2,2,1)
+imagesc(rot90(squeeze(double(X(:,150,:)))),[1 3])
+axis equal
+axis off
+colormap("jet")
+title('Original Slice')
+
+subplot(2,2,2)
+imagesc(rot90(squeeze(double(Xf(:,150,:)))),[1 3])
+axis equal
+axis off
+title('Full Reconstruction')
+
+subplot(2,2,3)
+imagesc(rot90(squeeze(double(Xslice))),[1 3])
+axis equal
+axis off
+title('Partial Reconstruction')
+xl = xlim;
+yl = ylim;
+
+subplot(2,2,4)
+imagesc(rot90(squeeze(double(Xds))),[1 3])
+xlim(xl);
+ylim(yl);
+axis equal
+axis off
+title('Partial+Downsampled Reconstruction')
+
+
+
+##### SOURCE END #####
+--></body></html>

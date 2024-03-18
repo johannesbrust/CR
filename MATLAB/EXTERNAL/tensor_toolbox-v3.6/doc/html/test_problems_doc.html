@@ -1,0 +1,715 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Creating Test Problems and Initial Guesses</title><meta name="generator" content="MATLAB 9.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-08-16"><meta name="DC.source" content="test_problems_doc.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:90%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:12px; color:#000; line-height:140%; background:#fff none; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:2.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+.banner{ background-color:#15243c; text-align:center;}
+.navigate {font-size:0.8em; padding:0px; line-height:100%; }
+
+pre, code { font-size:14px; }
+tt { font-size: 1.0em; font-weight:bold; background:#f7f7f7; padding-right:5px; padding-left:5px }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:20px 0px 0px; border-top:1px dotted #878787; font-size:0.9em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; padding:0px 20px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="banner"><a href="index.html"><img src="Tensor-Toolbox-for-MATLAB-Banner.png"></a></div><div class="content"><h1>Creating Test Problems and Initial Guesses</h1><!--introduction--><p>
+<p class="navigate">
+&#62;&#62; <a href="index.html">Tensor Toolbox</a>
+&#62;&#62; <a href="working.html">Working with Tensors</a>
+&#62;&#62; <a href="test_problems_doc.html">Creating Test Problems</a>
+</p>
+</p><p>We demonstrate how to use Tensor Toolbox <tt>create_problem</tt> and <tt>create_guess</tt> functions to create test problems for fitting algorithms.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Creating a CP test problem</a></li><li><a href="#6">Creating a Tucker test problem</a></li><li><a href="#9">Recreating the same test problem</a></li><li><a href="#14">Checking default parameters and recreating the same test problem</a></li><li><a href="#19">Options for creating factor matrices, core tensors, and lambdas</a></li><li><a href="#22">Generating data from an existing solution</a></li><li><a href="#23">Creating dense missing data problems</a></li><li><a href="#26">Creating sparse missing data problems.</a></li><li><a href="#29">Create missing data problems with a pre-specified pattern</a></li><li><a href="#30">Creating sparse problems (CP only)</a></li><li><a href="#32">Generating an initial guess</a></li></ul></div><pre class="codeinput">rng(<span class="string">'default'</span>); <span class="comment">%&lt;- Setting random seed for reproducibility of this script</span>
+</pre><h2 id="2">Creating a CP test problem</h2><p>The <tt>create_problem</tt> function allows a user to generate a test problem with a known solution having a pre-specified solution. The <tt>create_problem</tt> function generates both the solution (as a <tt>ktensor</tt> for CP) and the test data (as a <tt>tensor</tt>). We later show that a pre-specificed solution can be used as well.</p><pre class="codeinput"><span class="comment">% Create a problem</span>
+info = create_problem(<span class="string">'Size'</span>, [5 4 3], <span class="string">'Num_Factors'</span>, 3, <span class="string">'Noise'</span>, 0.10);
+</pre><pre class="codeinput"><span class="comment">% Display the solution created by create_problem</span>
+soln = info.Soln
+</pre><pre class="codeoutput">soln is a ktensor of size 5 x 4 x 3
+	soln.lambda = 
+		    0.6948    0.3171    0.9502
+	soln.U{1} = 
+		    0.5377   -1.3077   -1.3499
+		    1.8339   -0.4336    3.0349
+		   -2.2588    0.3426    0.7254
+		    0.8622    3.5784   -0.0631
+		    0.3188    2.7694    0.7147
+	soln.U{2} = 
+		   -0.2050    1.4172    1.6302
+		   -0.1241    0.6715    0.4889
+		    1.4897   -1.2075    1.0347
+		    1.4090    0.7172    0.7269
+	soln.U{3} = 
+		   -0.3034    0.8884   -0.8095
+		    0.2939   -1.1471   -2.9443
+		   -0.7873   -1.0689    1.4384
+</pre><pre class="codeinput"><span class="comment">% Display the data created by create_problem</span>
+data = info.Data
+</pre><pre class="codeoutput">data is a tensor of size 5 x 4 x 3
+	data(:,:,1) = 
+	    0.6406   -0.0053    1.7089    0.3286
+	   -3.9326   -1.1850   -3.1232   -1.8339
+	   -0.9485   -0.3204    0.0406    0.0859
+	    1.6481    0.9261   -1.8303    0.6222
+	    0.3243    0.6169   -1.9710   -0.0077
+	data(:,:,2) = 
+	    7.1696    2.6513    4.2567    2.9938
+	  -14.0474   -4.0639   -8.6171   -5.9845
+	   -3.3801   -1.5008   -2.3947   -2.6743
+	   -1.4145   -1.0496    1.9542   -0.3994
+	   -4.3450   -2.0053   -0.4684   -2.1417
+	data(:,:,3) = 
+	   -2.3827   -0.8279   -3.2592   -1.6532
+	    7.6351    2.4764    2.2490    1.7676
+	    1.2927    0.5233    3.0407    2.3518
+	   -1.6987   -0.8768    0.9062   -2.2220
+	    0.8113   -0.0613    2.7203   -0.3508
+</pre><pre class="codeinput"><span class="comment">% The difference between true solution and measured data should match the</span>
+<span class="comment">% specified 10% noise.</span>
+diff = norm(full(info.Soln) - info.Data)/norm(full(info.Soln))
+</pre><pre class="codeoutput">
+diff =
+
+    0.1000
+
+</pre><h2 id="6">Creating a Tucker test problem</h2><p>The <tt>create_problem</tt> function can also be used to create Tucker problems by specifying the <tt>'Type'</tt> as <tt>'Tucker'</tt>. In this case, the <tt>create_problem</tt> function generates both the solution (as a <tt>ttensor</tt> for Tucker) and the test data (as a <tt>tensor</tt>).</p><pre class="codeinput"><span class="comment">% Create a problem</span>
+info = create_problem(<span class="string">'Type'</span>, <span class="string">'Tucker'</span>, <span class="string">'Size'</span>, [5 4 3], <span class="string">'Num_Factors'</span>, [3 3 2]);
+</pre><pre class="codeinput"><span class="comment">% Display the Tucker-type solution created by create_problem</span>
+soln = info.Soln
+</pre><pre class="codeoutput">soln is a ttensor of size 5 x 4 x 3
+	soln.core is a tensor of size 3 x 3 x 2
+		soln.core(:,:,1) = 
+	   -1.5771    0.0335    0.3502
+	    0.5080   -1.3337   -0.2991
+	    0.2820    1.1275    0.0229
+		soln.core(:,:,2) = 
+	   -0.2620   -0.8314   -0.5336
+	   -1.7502   -0.9792   -2.0026
+	   -0.2857   -1.1564    0.9642
+	soln.U{1} = 
+		   -1.7947    0.3035   -0.1941
+		    0.8404   -0.6003   -2.1384
+		   -0.8880    0.4900   -0.8396
+		    0.1001    0.7394    1.3546
+		   -0.5445    1.7119   -1.0722
+	soln.U{2} = 
+		    0.9610   -0.1977    1.3790
+		    0.1240   -1.2078   -1.0582
+		    1.4367    2.9080   -0.4686
+		   -1.9609    0.8252   -0.2725
+	soln.U{3} = 
+		    1.0984   -2.0518
+		   -0.2779   -0.3538
+		    0.7015   -0.8236
+</pre><pre class="codeinput"><span class="comment">% Difference between true solution and measured data (default noise is 10%)</span>
+diff = norm(full(info.Soln) - info.Data)/norm(full(info.Soln))
+</pre><pre class="codeoutput">
+diff =
+
+    0.1000
+
+</pre><h2 id="9">Recreating the same test problem</h2><p>We can recreate exactly the same test problem when we use the same random seed and other parameters.</p><pre class="codeinput"><span class="comment">% Set-up, including specifying random state</span>
+sz = [5 4 3]; <span class="comment">%&lt;- Size</span>
+nf = 2; <span class="comment">%&lt;- Number of components</span>
+state = RandStream.getGlobalStream.State; <span class="comment">%&lt;- Random state</span>
+</pre><pre class="codeinput"><span class="comment">% Generate first test problem</span>
+info1 = create_problem(<span class="string">'Size'</span>, sz, <span class="string">'Num_Factors'</span>, nf, <span class="string">'State'</span>, state);
+</pre><pre class="codeinput"><span class="comment">% Generate second identical test problem</span>
+info2 = create_problem(<span class="string">'Size'</span>, sz, <span class="string">'Num_Factors'</span>, nf, <span class="string">'State'</span>, state);
+</pre><pre class="codeinput"><span class="comment">% Check that the solutions are identical</span>
+tf = isequal(info1.Soln, info2.Soln)
+</pre><pre class="codeoutput">
+tf =
+
+  logical
+
+   1
+
+</pre><pre class="codeinput"><span class="comment">% Check that the data are identical</span>
+diff = norm(info1.Data - info2.Data)
+</pre><pre class="codeoutput">
+diff =
+
+     0
+
+</pre><h2 id="14">Checking default parameters and recreating the same test problem</h2><p>The <tt>create_problem</tt> function returns the parameters that were used to generate it. These can be used to see the defaults. Additionally, if these are saved, they can be used to recreate the same test problems for future experiments.</p><pre class="codeinput"><span class="comment">% Generate test problem and use second output argument for parameters.</span>
+[info1,params] = create_problem(<span class="string">'Size'</span>, [5 4 3], <span class="string">'Num_Factors'</span>, 2);
+</pre><pre class="codeinput"><span class="comment">% Here are the parameters</span>
+params
+</pre><pre class="codeoutput">
+params = 
+
+  struct with fields:
+
+       Core_Generator: 'randn'
+     Factor_Generator: 'randn'
+     Lambda_Generator: 'rand'
+                    M: 0
+                Noise: 0.1000
+          Num_Factors: 2
+                 Size: [5 4 3]
+                 Soln: []
+    Sparse_Generation: 0
+             Sparse_M: 0
+                State: [625&times;1 uint32]
+            Symmetric: []
+                 Type: 'CP'
+
+</pre><pre class="codeinput"><span class="comment">% Recreate an identical test problem</span>
+info2 = create_problem(params);
+</pre><pre class="codeinput"><span class="comment">% Check that the solutions are identical</span>
+tf = isequal(info1.Soln, info2.Soln)
+</pre><pre class="codeoutput">
+tf =
+
+  logical
+
+   1
+
+</pre><pre class="codeinput"><span class="comment">% Check that the data are identical</span>
+diff = norm(info1.Data - info2.Data)
+</pre><pre class="codeoutput">
+diff =
+
+     0
+
+</pre><h2 id="19">Options for creating factor matrices, core tensors, and lambdas</h2><p>Any function with two arguments specifying the size can be used to generate the factor matrices. This is specified by the <tt>'Factor_Generator'</tt> option to <tt>create_problem</tt>.</p><p>Pre-defined options for <tt>'Factor_Generator'</tt> for creating factor matrices (for CP or Tucker) include:</p><div><ul><li><tt>'rand'</tt> - Uniform on [0,1]</li><li><tt>'randn'</tt> - Gaussian with mean 0 and std 1</li><li><tt>'orthogonal'</tt> - Generates a random orthogonal matrix. This option only works when the number of factors is less than or equal to the smallest dimension.</li><li><tt>'stochastic'</tt> - Generates nonnegative factor matrices so that each column sums to one.</li></ul></div><p>Pre-defined options for <tt>'Lambda_Generator'</tt> for creating lambda vector (for CP) include:</p><div><ul><li><tt>'rand'</tt> - Uniform on [0,1]</li><li><tt>'randn'</tt> - Gaussian with mean 0 and std 1</li><li><tt>'orthogonal'</tt> - Creates a random vector with norm one.</li><li><tt>'stochastic'</tt> - Creates a random nonnegative vector whose entries sum to one.</li></ul></div><p>Pre-defined options for <tt>'Core_Generator'</tt> for creating core tensors (for Tucker) include:</p><div><ul><li><tt>'rand'</tt> - Uniform on [0,1]</li><li><tt>'randn'</tt> - Gaussian with mean 0 and std 1</li></ul></div><pre class="codeinput"><span class="comment">% Here is ane example of a custom factor generator</span>
+factor_generator = @(m,n) 100*rand(m,n);
+info = create_problem(<span class="string">'Size'</span>, [5 4 3], <span class="string">'Num_Factors'</span>, 2, <span class="keyword">...</span>
+    <span class="string">'Factor_Generator'</span>, factor_generator, <span class="string">'Lambda_Generator'</span>, @ones);
+first_factor_matrix = info.Soln.U{1}
+</pre><pre class="codeoutput">
+first_factor_matrix =
+
+   34.3877   81.7761
+   58.4069   26.0728
+   10.7769   59.4356
+   90.6308    2.2513
+   87.9654   42.5259
+
+</pre><pre class="codeinput"><span class="comment">% Here is an example of a custom core generator for Tucker:</span>
+info = create_problem(<span class="string">'Type'</span>, <span class="string">'Tucker'</span>, <span class="string">'Size'</span>, [5 4 3], <span class="keyword">...</span>
+    <span class="string">'Num_Factors'</span>, [2 2 2], <span class="string">'Core_Generator'</span>, @tenones);
+core = info.Soln.core
+</pre><pre class="codeoutput">core is a tensor of size 2 x 2 x 2
+	core(:,:,1) = 
+	     1     1
+	     1     1
+	core(:,:,2) = 
+	     1     1
+	     1     1
+</pre><pre class="codeinput"><span class="comment">% Here's another example for CP, this time using a function to create</span>
+<span class="comment">% factor matrices such that the inner products of the columns are</span>
+<span class="comment">% prespecified.</span>
+info = create_problem(<span class="string">'Size'</span>, [5 4 3], <span class="string">'Num_Factors'</span>, 3, <span class="keyword">...</span>
+    <span class="string">'Factor_Generator'</span>, @(m,n) matrandcong(m,n,.9));
+U = info.Soln.U{1};
+congruences = U'*U
+</pre><pre class="codeoutput">
+congruences =
+
+    1.0000    0.9000    0.9000
+    0.9000    1.0000    0.9000
+    0.9000    0.9000    1.0000
+
+</pre><h2 id="22">Generating data from an existing solution</h2><p>It's possible to skip the solution generation altogether and instead just generate appropriate test data.</p><pre class="codeinput"><span class="comment">% Manually generate a test problem (or it comes from some</span>
+<span class="comment">% previous call to |create_problem|.</span>
+soln = ktensor({rand(50,3), rand(40,3), rand(30,3)});
+
+<span class="comment">% Use that soln to create new test problem.</span>
+info = create_problem(<span class="string">'Soln'</span>, soln);
+
+<span class="comment">% Check whether solutions is equivalent to the input</span>
+iseq = isequal(soln,info.Soln)
+</pre><pre class="codeoutput">
+iseq =
+
+  logical
+
+   1
+
+</pre><h2 id="23">Creating dense missing data problems</h2><p>It's possible to create problems that have a percentage of missing data. The problem generator randomly creates the pattern of missing data.</p><pre class="codeinput"><span class="comment">% Specify 25% missing data as follows:</span>
+[info,params] = create_problem(<span class="string">'Size'</span>, [5 4 3], <span class="string">'M'</span>, 0.25);
+</pre><pre class="codeinput"><span class="comment">% Here is the pattern of known data (1 = known, 0 = unknown)</span>
+info.Pattern
+</pre><pre class="codeoutput">ans is a tensor of size 5 x 4 x 3
+	ans(:,:,1) = 
+	     1     1     1     0
+	     1     1     1     1
+	     1     1     1     1
+	     1     1     1     0
+	     1     1     0     0
+	ans(:,:,2) = 
+	     1     1     1     0
+	     1     1     0     0
+	     1     1     0     1
+	     1     1     0     0
+	     1     1     0     1
+	ans(:,:,3) = 
+	     1     1     1     0
+	     1     1     1     1
+	     1     0     1     1
+	     1     1     0     1
+	     1     0     1     1
+</pre><pre class="codeinput"><span class="comment">% Here is the data (incl. noise) with missing entries zeroed out</span>
+info.Data
+</pre><pre class="codeoutput">ans is a tensor of size 5 x 4 x 3
+	ans(:,:,1) = 
+	    0.0701   -0.0140   -0.0197         0
+	   -0.0250    0.0174    0.0090    0.0055
+	   -0.0100   -0.0118    0.0130    0.0182
+	   -0.0267   -0.0170    0.0305         0
+	    0.0729   -0.0061         0         0
+	ans(:,:,2) = 
+	    0.4143    0.0336   -0.4037         0
+	   -0.0852   -0.0181         0         0
+	   -0.2301    0.0085         0   -0.0270
+	   -0.4196    0.0960         0         0
+	    0.5840   -0.0401         0    0.0903
+	ans(:,:,3) = 
+	   -0.1069    0.0860   -0.0161         0
+	    0.0445   -0.0541    0.0299   -0.0440
+	    0.0237         0    0.0079   -0.0278
+	   -0.1259    0.1210         0    0.0169
+	   -0.0465         0    0.0309   -0.0240
+</pre><h2 id="26">Creating sparse missing data problems.</h2><p>If <tt>Sparse_M</tt> is set to true, then the data returned is sparse. Moreover, the dense versions are never explicitly created. This option only works when M &gt;= 0.8.</p><pre class="codeinput"><span class="comment">% Specify 80% missing data and sparse</span>
+info = create_problem(<span class="string">'Size'</span>, [5 4 3], <span class="string">'M'</span>, 0.80, <span class="string">'Sparse_M'</span>, true);
+</pre><pre class="codeinput"><span class="comment">% Here is the pattern of known data</span>
+info.Pattern
+</pre><pre class="codeoutput">ans is a sparse tensor of size 5 x 4 x 3 with 12 nonzeros
+	(1,4,2)     1
+	(2,1,2)     1
+	(2,2,3)     1
+	(2,4,3)     1
+	(3,1,1)     1
+	(3,3,3)     1
+	(3,4,2)     1
+	(4,1,1)     1
+	(4,2,1)     1
+	(4,2,3)     1
+	(5,1,2)     1
+	(5,4,2)     1
+</pre><pre class="codeinput"><span class="comment">% Here is the data (incl. noise) with missing entries zeroed out</span>
+info.Data
+</pre><pre class="codeoutput">ans is a sparse tensor of size 5 x 4 x 3 with 12 nonzeros
+	(1,4,2)   -0.0137
+	(2,1,2)   -0.6286
+	(2,2,3)   -0.2961
+	(2,4,3)    0.1887
+	(3,1,1)   -0.2856
+	(3,3,3)   -1.3309
+	(3,4,2)   -0.1728
+	(4,1,1)   -0.0357
+	(4,2,1)   -0.0268
+	(4,2,3)   -0.3739
+	(5,1,2)   -0.3906
+	(5,4,2)    0.0938
+</pre><h2 id="29">Create missing data problems with a pre-specified pattern</h2><p>It's also possible to provide a specific pattern (dense or sparse) to be used to specify where data should be missing.</p><pre class="codeinput"><span class="comment">% Create pattern</span>
+P = tenrand([5 4 3]) &gt; 0.5;
+<span class="comment">% Create test problem with that pattern</span>
+info = create_problem(<span class="string">'Size'</span>, size(P), <span class="string">'M'</span>, P);
+<span class="comment">% Show the data</span>
+info.Data
+</pre><pre class="codeoutput">ans is a tensor of size 5 x 4 x 3
+	ans(:,:,1) = 
+	         0   -0.6323         0         0
+	    0.1566         0   -0.4187         0
+	    0.0044         0         0         0
+	    0.0508   -0.7211    0.1713         0
+	         0         0         0         0
+	ans(:,:,2) = 
+	         0         0         0   -0.0151
+	   -0.0909         0    0.0607         0
+	    0.0084         0         0         0
+	         0   -0.7582         0         0
+	   -0.0734    0.1987         0         0
+	ans(:,:,3) = 
+	   -0.1618   -0.3415    0.5567    0.4957
+	    0.1608         0   -0.5744   -0.4850
+	   -0.0797         0         0    0.1821
+	         0         0   -0.1827         0
+	         0         0         0         0
+</pre><h2 id="30">Creating sparse problems (CP only)</h2><p>If we assume each model parameter is the input to a Poisson process, then we can generate a sparse test problems. This requires that all the factor matrices and lambda be nonnegative. The default factor generator ('randn') won't work since it produces both positive and negative values.</p><pre class="codeinput"><span class="comment">% Generate factor matrices with a few large entries in each column; this</span>
+<span class="comment">% will be the basis of our soln.</span>
+sz = [20 15 10];
+nf = 4;
+A = cell(3,1);
+<span class="keyword">for</span> n = 1:length(sz)
+    A{n} = rand(sz(n), nf);
+    <span class="keyword">for</span> r = 1:nf
+        p = randperm(sz(n));
+        idx = p(1:round(.2*sz(n)));
+        A{n}(idx,r) = 10 * A{n}(idx,r);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+S = ktensor(A);
+S = normalize(S,<span class="string">'sort'</span>,1);
+</pre><pre class="codeinput"><span class="comment">% Create sparse test problem based on provided solution. The</span>
+<span class="comment">% 'Sparse_Generation' says how many insertions to make based on the</span>
+<span class="comment">% provided solution S. The lambda vector of the solution is automatically</span>
+<span class="comment">% rescaled to match the number of insertions.</span>
+info = create_problem(<span class="string">'Soln'</span>, S, <span class="string">'Sparse_Generation'</span>, 500);
+num_nonzeros = nnz(info.Data)
+total_insertions = sum(info.Data.vals)
+orig_lambda_vs_rescaled = S.lambda ./ info.Soln.lambda
+</pre><pre class="codeoutput">
+num_nonzeros =
+
+   326
+
+
+total_insertions =
+
+   500
+
+
+orig_lambda_vs_rescaled =
+
+   84.4101
+   84.4101
+   84.4101
+   84.4101
+
+</pre><h2 id="32">Generating an initial guess</h2><p>The <tt>create_guess</tt> function creates a random initial guess as a cell array of matrices. Its behavior is very similar to <tt>create_problem</tt>. A nice option is that you can generate an initial guess that is a pertubation of the solution.</p><pre class="codeinput">info = create_problem;
+
+<span class="comment">% Create an initial guess to go with the problem that is just a 5%</span>
+<span class="comment">% pertubation of the correct solution.</span>
+U = create_guess(<span class="string">'Soln'</span>, info.Soln, <span class="string">'Factor_Generator'</span>, <span class="string">'pertubation'</span>, <span class="keyword">...</span>
+    <span class="string">'Pertubation'</span>, 0.05);
+</pre><p class="footer">Tensor Toolbox for MATLAB: <a href="index.html">www.tensortoolbox.org</a>.</p></div><!--
+##### SOURCE BEGIN #####
+%% Creating Test Problems and Initial Guesses
+%
+% <html>
+% <p class="navigate">
+% &#62;&#62; <a href="index.html">Tensor Toolbox</a> 
+% &#62;&#62; <a href="working.html">Working with Tensors</a> 
+% &#62;&#62; <a href="test_problems_doc.html">Creating Test Problems</a>
+% </p>
+% </html>
+%
+% We demonstrate how to use Tensor Toolbox |create_problem| and
+% |create_guess| functions to create test problems for fitting algorithms. 
+
+%%
+rng('default'); %<- Setting random seed for reproducibility of this script
+
+%% Creating a CP test problem
+% The |create_problem| function allows a user to generate a test problem
+% with a known solution having a pre-specified solution. The
+% |create_problem| function generates both the solution (as a |ktensor| for
+% CP) and the test data (as a |tensor|). We later show that a
+% pre-specificed solution can be used as well.
+
+% Create a problem
+info = create_problem('Size', [5 4 3], 'Num_Factors', 3, 'Noise', 0.10);
+
+%%
+
+% Display the solution created by create_problem
+soln = info.Soln
+
+%%
+
+% Display the data created by create_problem
+data = info.Data
+
+%%
+
+% The difference between true solution and measured data should match the
+% specified 10% noise.
+diff = norm(full(info.Soln) - info.Data)/norm(full(info.Soln))
+
+%% Creating a Tucker test problem
+% The |create_problem| function can also be used to create Tucker problems
+% by specifying the |'Type'| as |'Tucker'|. In this case, the
+% |create_problem| function generates both the solution (as a |ttensor| for
+% Tucker) and the test data (as a |tensor|). 
+
+% Create a problem
+info = create_problem('Type', 'Tucker', 'Size', [5 4 3], 'Num_Factors', [3 3 2]);
+
+%%
+
+% Display the Tucker-type solution created by create_problem
+soln = info.Soln
+
+%%
+
+% Difference between true solution and measured data (default noise is 10%)
+diff = norm(full(info.Soln) - info.Data)/norm(full(info.Soln))
+
+%% Recreating the same test problem
+% We can recreate exactly the same test problem when we use the same random
+% seed and other parameters.
+
+% Set-up, including specifying random state
+sz = [5 4 3]; %<- Size
+nf = 2; %<- Number of components
+state = RandStream.getGlobalStream.State; %<- Random state
+
+%%
+
+% Generate first test problem
+info1 = create_problem('Size', sz, 'Num_Factors', nf, 'State', state);
+
+%%
+
+% Generate second identical test problem
+info2 = create_problem('Size', sz, 'Num_Factors', nf, 'State', state);
+
+%%
+
+% Check that the solutions are identical
+tf = isequal(info1.Soln, info2.Soln)
+
+%%
+
+% Check that the data are identical
+diff = norm(info1.Data - info2.Data)
+
+%% Checking default parameters and recreating the same test problem
+% The |create_problem| function returns the parameters that were used to
+% generate it. These can be used to see the defaults. Additionally, if
+% these are saved, they can be used to recreate the same test problems for
+% future experiments.
+
+% Generate test problem and use second output argument for parameters.
+[info1,params] = create_problem('Size', [5 4 3], 'Num_Factors', 2);
+
+%%
+
+% Here are the parameters
+params 
+
+%%
+
+% Recreate an identical test problem
+info2 = create_problem(params);
+
+%%
+
+% Check that the solutions are identical
+tf = isequal(info1.Soln, info2.Soln)
+
+%%
+
+% Check that the data are identical
+diff = norm(info1.Data - info2.Data)
+
+%% Options for creating factor matrices, core tensors, and lambdas
+% Any function with two arguments specifying the size can be used to
+% generate the factor matrices. This is specified by the
+% |'Factor_Generator'| option to |create_problem|.
+%
+% Pre-defined options for |'Factor_Generator'| for creating factor matrices
+% (for CP or Tucker) include:  
+%
+% * |'rand'| - Uniform on [0,1] 
+% * |'randn'| - Gaussian with mean 0 and std 1
+% * |'orthogonal'| - Generates a random orthogonal matrix. This option only
+% works when the number of factors is less than or equal to the smallest
+% dimension.
+% * |'stochastic'| - Generates nonnegative factor matrices so that each
+% column sums to one. 
+%
+% Pre-defined options for |'Lambda_Generator'| for creating lambda vector
+% (for CP) include: 
+%
+% * |'rand'| - Uniform on [0,1] 
+% * |'randn'| - Gaussian with mean 0 and std 1
+% * |'orthogonal'| - Creates a random vector with norm one.
+% * |'stochastic'| - Creates a random nonnegative vector whose entries sum
+% to one. 
+%
+% Pre-defined options for |'Core_Generator'| for creating core tensors (for
+% Tucker) include: 
+%
+% * |'rand'| - Uniform on [0,1] 
+% * |'randn'| - Gaussian with mean 0 and std 1
+
+% Here is ane example of a custom factor generator 
+factor_generator = @(m,n) 100*rand(m,n);
+info = create_problem('Size', [5 4 3], 'Num_Factors', 2, ...
+    'Factor_Generator', factor_generator, 'Lambda_Generator', @ones);
+first_factor_matrix = info.Soln.U{1}
+
+%%
+
+% Here is an example of a custom core generator for Tucker:
+info = create_problem('Type', 'Tucker', 'Size', [5 4 3], ...
+    'Num_Factors', [2 2 2], 'Core_Generator', @tenones);
+core = info.Soln.core
+
+%%
+
+% Here's another example for CP, this time using a function to create
+% factor matrices such that the inner products of the columns are
+% prespecified.
+info = create_problem('Size', [5 4 3], 'Num_Factors', 3, ...
+    'Factor_Generator', @(m,n) matrandcong(m,n,.9));
+U = info.Soln.U{1};
+congruences = U'*U
+
+%% Generating data from an existing solution
+% It's possible to skip the solution generation altogether and instead just
+% generate appropriate test data.
+
+% Manually generate a test problem (or it comes from some
+% previous call to |create_problem|.
+soln = ktensor({rand(50,3), rand(40,3), rand(30,3)});
+
+% Use that soln to create new test problem.
+info = create_problem('Soln', soln);
+
+% Check whether solutions is equivalent to the input
+iseq = isequal(soln,info.Soln)
+
+%% Creating dense missing data problems
+% It's possible to create problems that have a percentage of missing data.
+% The problem generator randomly creates the pattern of missing data.
+
+% Specify 25% missing data as follows:
+[info,params] = create_problem('Size', [5 4 3], 'M', 0.25);
+
+%% 
+
+% Here is the pattern of known data (1 = known, 0 = unknown)
+info.Pattern
+
+%%
+
+% Here is the data (incl. noise) with missing entries zeroed out
+info.Data 
+
+%% Creating sparse missing data problems. 
+% If |Sparse_M| is set to true, then the data returned
+% is sparse. Moreover, the dense versions are never explicitly created.
+% This option only works when M >= 0.8.
+
+% Specify 80% missing data and sparse
+info = create_problem('Size', [5 4 3], 'M', 0.80, 'Sparse_M', true);
+
+%% 
+
+% Here is the pattern of known data
+info.Pattern
+
+%%
+
+% Here is the data (incl. noise) with missing entries zeroed out
+info.Data 
+
+%% Create missing data problems with a pre-specified pattern
+% It's also possible to provide a specific pattern (dense or sparse) to be
+% used to specify where data should be missing.
+
+% Create pattern
+P = tenrand([5 4 3]) > 0.5;
+% Create test problem with that pattern
+info = create_problem('Size', size(P), 'M', P);
+% Show the data
+info.Data
+
+%% Creating sparse problems (CP only)
+% If we assume each model parameter is the input to a Poisson process, then
+% we can generate a sparse test problems. This requires that all the factor
+% matrices and lambda be nonnegative. The default factor generator
+% ('randn') won't work since it produces both positive and negative values.
+
+% Generate factor matrices with a few large entries in each column; this
+% will be the basis of our soln.
+sz = [20 15 10];
+nf = 4;
+A = cell(3,1);
+for n = 1:length(sz)
+    A{n} = rand(sz(n), nf);
+    for r = 1:nf
+        p = randperm(sz(n));
+        idx = p(1:round(.2*sz(n)));
+        A{n}(idx,r) = 10 * A{n}(idx,r);
+    end
+end
+S = ktensor(A);
+S = normalize(S,'sort',1);
+%%
+
+% Create sparse test problem based on provided solution. The
+% 'Sparse_Generation' says how many insertions to make based on the
+% provided solution S. The lambda vector of the solution is automatically
+% rescaled to match the number of insertions.
+info = create_problem('Soln', S, 'Sparse_Generation', 500);
+num_nonzeros = nnz(info.Data)
+total_insertions = sum(info.Data.vals)
+orig_lambda_vs_rescaled = S.lambda ./ info.Soln.lambda
+
+%% Generating an initial guess
+% The |create_guess| function creates a random initial guess as a cell
+% array of matrices. Its behavior is very similar to |create_problem|. A
+% nice option is that you can generate an initial guess that is a
+% pertubation of the solution.
+
+info = create_problem;
+
+% Create an initial guess to go with the problem that is just a 5%
+% pertubation of the correct solution.
+U = create_guess('Soln', info.Soln, 'Factor_Generator', 'pertubation', ...
+    'Pertubation', 0.05);
+
+
+##### SOURCE END #####
+--></body></html>
