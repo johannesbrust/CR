@@ -170,7 +170,7 @@ If this work is useful to you, you can cite this work as (bibtex)
   institution = {School of Mathematical and Statistical Sciences, Arizona State University, Tempe, AZ},
   type        = {Technical Report},
   year        = {2024},
-  url         = {https://doi.org/10.48550/arXiv.2209.12057}
+  url         = {https://arxiv.org/abs/2403.12206}
 }
 ```
 
