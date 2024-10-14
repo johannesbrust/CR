@@ -19,6 +19,8 @@ Content:
 
 Notes: The Matlab codes use external functions from `[1]` for tensor computations.
 The Python code uses `[2]` for interfaces to neural networks.
+
+**Update** (Fall 2024): The CR algorithm is implemented as part of the the Tensor Toolbox for MATLAB, Version 3.6
     
 ## Example(s)
 
